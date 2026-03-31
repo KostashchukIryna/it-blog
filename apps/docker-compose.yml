@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: it_blog_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: it_blog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: it_blog_app
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file:
+      - backend/.env
+    environment:
+      DB_HOST: db
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  pgdata:
