@@ -40,6 +40,9 @@ app.use((err, _req, res, _next) => {
 
 /* ── Start ─────────────────────────────────────────────────────── */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀  IT Blog API running on http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`  IT Blog API running on http://${HOST}:${PORT}`);
+  console.log(`  External access: Ready for connections`);
 });
