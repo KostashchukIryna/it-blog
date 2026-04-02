@@ -5,11 +5,12 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --production
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl bash
 COPY . .
 
-# The backend should handle migrations on startup if needed.
+# Make startup script executable
+RUN chmod +x start.sh
 
 EXPOSE 3001
 
-CMD ["node", "src/index.js"]
+CMD ["./start.sh"]
