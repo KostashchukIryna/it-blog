@@ -1,37 +1,61 @@
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-
-// Mock data
-const ALL_ARTICLES = Array.from({ length: 143 }).map((_, i) => ({
-  id: i + 1,
-  title: i === 0 ? "Майбутнє штучного інтелекту у 2026 році" : `Цікава новина про IT №${i + 1}`,
-  slug: `news-${i + 1}`,
-  info: "Дізнайтеся, як нові технології змінюють світ розробки та які навички будуть критично важливими...",
-  category: i % 4 === 0 ? "JavaScript" : i % 4 === 1 ? "Backend" : i % 4 === 2 ? "Штучний інтелект" : "Кібербезпека",
-  author: "Олександр Технік",
-  date: "30 Березня, 2026",
-  image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400" 
-}));
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function HomePage() {
-  // Active category state
-  const [activeCategory, setActiveCategory] = useState('Всі');
+  const [articles, setArticles] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [activeCategory, setActiveCategory] = useState("Всі");
   const [limit, setLimit] = useState(12);
 
-  const categories = ['Всі', 'JavaScript', 'Backend', 'Штучний інтелект', 'Кібербезпека'];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [artRes, catRes] = await Promise.all([
+          fetch("http://localhost:3000/api/articles"),
+          fetch("http://localhost:3000/api/categories"),
+        ]);
 
-  // Filter array by category
-  const filteredArticles = ALL_ARTICLES.filter(article => 
-    activeCategory === 'Всі' || article.category === activeCategory
-  );
+        const artResult = await artRes.json();
+        const catResult = await catRes.json();
+
+        setArticles(artResult.data || []);
+
+        const realCategories = catResult.data || catResult || [];
+        setCategories(["Всі", ...realCategories.map((c: any) => c.name)]);
+      } catch (error) {
+        console.error("Помилка завантаження даних:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredArticles = articles.filter((article: any) => {
+    if (activeCategory === "Всі") return true;
+    return article.category?.name === activeCategory;
+  });
 
   const visibleArticles = filteredArticles.slice(0, limit);
 
   const showMore = () => {
     setLimit((prev) => prev + 12);
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white min-h-screen flex items-center justify-center">
+        <h1 className="text-2xl font-black text-slate-300 uppercase tracking-widest animate-pulse">
+          Синхронізація з базою...
+        </h1>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white min-h-screen">
@@ -41,19 +65,18 @@ export default function HomePage() {
             Останні публікації
           </h1>
 
-          {/* Filter buttons */}
           <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((cat) => (
-              <button 
+              <button
                 key={cat}
                 onClick={() => {
                   setActiveCategory(cat);
                   setLimit(12);
                 }}
                 className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
-                  activeCategory === cat 
-                    ? 'bg-slate-900 text-white border-slate-900' 
-                    : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
+                  activeCategory === cat
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"
                 }`}
               >
                 {cat}
@@ -62,42 +85,50 @@ export default function HomePage() {
           </div>
 
           <p className="text-slate-400 font-medium">
-            Показано {visibleArticles.length} із {filteredArticles.length} статей
+            Показано {visibleArticles.length} із {filteredArticles.length}{" "}
+            статей
           </p>
         </header>
 
-        {/* Posts grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {visibleArticles.map((article) => (
-            <article key={article.id} className="group border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+          {visibleArticles.map((article: any) => (
+            <article
+              key={article.id}
+              className="group border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all"
+            >
               <div className="aspect-video bg-slate-200 relative overflow-hidden">
-                <img 
-                  src={article.image} 
-                  alt="" 
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" 
+                <img
+                  src={
+                    article.cover_url ||
+                    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"
+                  }
+                  alt={article.title}
+                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <div className="p-6">
                 <span className="text-blue-600 text-[10px] font-bold uppercase tracking-widest">
-                  {article.category}
+                  {article.category?.name || "Без категорії"}
                 </span>
                 <h2 className="text-xl font-bold mt-2 leading-tight">
-                  <Link href={`/articles/${article.slug}`} className="hover:text-blue-600 transition-colors">
+                  <Link
+                    href={`/articles/${article.slug}`}
+                    className="hover:text-blue-600 transition-colors"
+                  >
                     {article.title}
                   </Link>
                 </h2>
                 <p className="text-slate-500 text-sm mt-3 line-clamp-2">
-                  {article.info}
+                  {article.excerpt}
                 </p>
               </div>
             </article>
           ))}
         </div>
 
-        {/* LOAD MORE POSTS */}
         {limit < filteredArticles.length && (
           <div className="mt-20 text-center">
-            <button 
+            <button
               onClick={showMore}
               className="px-12 py-5 uppercase bg-slate-900 text-white text-xs font-black rounded-[25px] hover:bg-blue-600 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
             >
@@ -106,11 +137,13 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* NO MORE POSTS TO SHOW */}
-        {(limit >= filteredArticles.length || filteredArticles.length === 0) && (
+        {(limit >= filteredArticles.length ||
+          filteredArticles.length === 0) && (
           <div className="mt-20 text-center py-10 border-t border-slate-50">
             <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
-              {filteredArticles.length === 0 ? "Статей у цій категорії не знайдено" : "Це всі доступні публікації на сьогодні"}
+              {filteredArticles.length === 0
+                ? "Статей у цій категорії не знайдено"
+                : "Це всі доступні публікації на сьогодні"}
             </p>
           </div>
         )}

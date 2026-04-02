@@ -1,37 +1,50 @@
 "use client";
 
-import { useState, use } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-
-// Mock data
-const AUTHORS_INFO: Record<string, { name: string; role: string; bio: string; avatar: string }> = {
-  'oleksandr-tekhnik': {
-    name: 'Олександр Технік',
-    role: 'Senior Software Engineer',
-    bio: 'Розробник з 5-річним досвідом. Пишу про сучасні веб-технології, архітектуру додатків та розповідаю складні речі простими словами.',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400' // Фото профілю
-  }
-};
-
-const ALL_ARTICLES = Array.from({ length: 24 }).map((_, i) => ({
-  id: i + 1,
-  title: `Цікава новина про IT №${i + 1}`,
-  slug: `news-${i + 1}`,
-  excerpt: "Дізнайтеся, як нові технології змінюють світ розробки та які навички будуть критично важливими...",
-  category: i % 3 === 0 ? "JavaScript" : "AI & ML",
-  authorSlug: "oleksandr-tekhnik",
-  date: "30 Березня, 2026",
-  image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"
-}));
 
 export default function AuthorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
+  
+  const [author, setAuthor] = useState<any>(null);
+  const [articles, setArticles] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const [limit, setLimit] = useState(12);
 
-  const author = AUTHORS_INFO[slug];
-  
-  const authorArticles = ALL_ARTICLES.filter(art => art.authorSlug === slug);
-  const visibleArticles = authorArticles.slice(0, limit);
+  useEffect(() => {
+    const fetchAuthorData = async () => {
+      try {
+        const authorRes = await fetch(`http://localhost:3000/api/authors/${slug}`);
+        if (authorRes.ok) {
+          const authorData = await authorRes.json();
+          setAuthor(authorData.data || authorData);
+        }
+
+        const articlesRes = await fetch(`http://localhost:3000/api/authors/${slug}/articles`);
+        if (articlesRes.ok) {
+          const articlesData = await articlesRes.json();
+          setArticles(articlesData.data || articlesData.rows || []);
+        }
+      } catch (error) {
+        console.error("Помилка завантаження:", error);
+      } finally {
+        setIsLoading(false); 
+      }
+    };
+
+    fetchAuthorData();
+  }, [slug]);
+
+  const visibleArticles = articles.slice(0, limit);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-2xl font-bold text-slate-300 uppercase tracking-widest">Завантаження профілю...</p>
+      </div>
+    );
+  }
 
   if (!author) {
     return (
@@ -44,12 +57,14 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
   return (
     <div className="bg-white min-h-screen">
       
-      {/* Profile*/}
       <section className="bg-slate-50 border-b border-slate-100 pt-20 pb-16 px-6">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-8">
-          {/* Picture */}
-          <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 rounded-full overflow-hidden border-4 border-white shadow-xl">
-            <img src={author.avatar} alt={author.name} className="w-full h-full object-cover" />
+          <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-900 flex items-center justify-center text-white text-6xl font-black">
+            {author.avatar_url ? (
+              <img src={author.avatar_url} alt={author.name} className="w-full h-full object-cover" />
+            ) : (
+              author.name?.[0] || "А"
+            )}
           </div>
           
           {/* Info */}
@@ -58,39 +73,48 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
               {author.name}
             </h1>
             <p className="text-blue-600 font-bold uppercase tracking-widest text-xs mb-6 ml-[3px]">
-              {author.role}
+              {author.role || "Автор блогу"}
             </p>
             <p className="text-slate-600 text-lg leading-relaxed max-w-2xl ml-[3px]">
-              {author.bio}
+              {author.bio || "Цей автор ще не додав розгорнуту інформацію про себе."}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Authors posts */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-2xl font-black text-slate-900 mb-10 tracking-tight border-l-4 border-blue-600 pl-4">
-          Публікації автора ({authorArticles.length})
+          Публікації автора ({articles.length})
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {visibleArticles.map((article) => (
-            <article key={article.id} className="group flex flex-col">
-              <div className="aspect-video bg-slate-100 relative overflow-hidden rounded-3xl mb-6 shadow-sm">
-                <img src={article.image} alt="" className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" />
-              </div>
-              <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
-                {article.category}
-              </span>
-              <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
-                <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-              </h3>
-            </article>
-          ))}
-        </div>
+        {articles.length === 0 ? (
+           <div className="text-center py-20 border border-dashed border-slate-200 rounded-3xl">
+             <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Цей автор ще не має статей</p>
+           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {visibleArticles.map((article: any) => (
+              <article key={article.id} className="group flex flex-col">
+                <div className="aspect-video bg-slate-100 relative overflow-hidden rounded-3xl mb-6 shadow-sm">
+                  <img 
+                    src={article.cover_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"} 
+                    alt="" 
+                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" 
+                  />
+                </div>
+                <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
+                  {/* Беремо ім'я категорії з об'єкта */}
+                  {article.category?.name || "Без категорії"}
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
+                  <Link href={`/articles/${article.slug}`}>{article.title}</Link>
+                </h3>
+              </article>
+            ))}
+          </div>
+        )}
 
-        {/* Load more */}
-        {limit < authorArticles.length && (
+        {limit < articles.length && (
           <div className="mt-20 text-center">
             <button 
               onClick={() => setLimit(prev => prev + 12)}
