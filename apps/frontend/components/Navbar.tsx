@@ -1,11 +1,12 @@
 import Link from "next/link";
 import SearchField from "./SearchField";
 import AdminButton from "./AdminButton";
+import { apiFetch } from "@/lib/api";
 
 export default async function Navbar() {
   let categories = [];
   try {
-    const res = await fetch("/api/categories", { cache: "no-store" });
+    const res = await apiFetch("/api/categories", { cache: "no-store" });
     if (res.ok) {
       const result = await res.json();
       categories = result.data || result || [];
