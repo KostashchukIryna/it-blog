@@ -32,16 +32,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        // The BACKEND_URL is set in docker-compose for production, 
-        // and in .env.local for local development
-        destination: `${process.env.BACKEND_URL}/api/:path*`,
-      },
-    ]
-  },
 };
+
 
 export default nextConfig;
