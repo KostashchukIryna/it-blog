@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -36,7 +36,7 @@ export default function LoginPage() {
           const role = user.is_admin ? "admin" : "user";
           localStorage.setItem("user_role", role);
 
-          window.location.href = "/admin/dashboard";
+          router.push("/admin/dashboard");
         } else {
           setError("Помилка: Сервер не надіслав дані користувача");
         }

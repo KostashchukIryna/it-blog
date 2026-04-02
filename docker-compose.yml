@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: it_blog_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/backend/migrations:/docker-entrypoint-initdb.d # Запускаємо міграції при першому старті БД
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./apps/backend
+    container_name: it_blog_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    environment:
+      # Явно вказуємо окремі змінні для підключення PostgreSQL
+      - PGHOST=db
+      - PGUSER=${POSTGRES_USER}
+      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - PGDATABASE=${POSTGRES_DB}
+      - PGPORT=5432
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+    volumes:
+      - ./apps/backend/uploads:/app/uploads
+    healthcheck:
+      # Перевіряємо, чи відповідає API на запит стану
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s # Даємо контейнеру час на запуск перед першою перевіркою
+    # Спочатку запускаємо сідер, а потім основний додаток
+    command: sh -c "node src/seed.js && node src/index.js"
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      args:
+        # Ця змінна потрібна на етапі збірки для next.config.ts
+        - BACKEND_URL=http://backend:3001
+    container_name: it_blog_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - BACKEND_URL=http://backend:3001
+      - NODE_ENV=production
+
+volumes:
+  postgres_data:

@@ -10,7 +10,7 @@ export default function ArticlesPage() {
   const loadArticles = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/api/admin/articles", {
+      const res = await fetch("/api/admin/articles", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const result = await res.json();
@@ -31,7 +31,7 @@ export default function ArticlesPage() {
     if (!confirm("Ви впевнені, що хочете видалити цю статтю назавжди?")) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/articles/${id}`, {
+      const res = await fetch(`/api/admin/articles/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });

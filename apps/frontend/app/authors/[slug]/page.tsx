@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function AuthorPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function AuthorPage() {
+  const { slug } = useParams();
   
   const [author, setAuthor] = useState<any>(null);
   const [articles, setArticles] = useState<any[]>([]);
@@ -14,14 +15,15 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
 
   useEffect(() => {
     const fetchAuthorData = async () => {
+      if (!slug) return;
       try {
-        const authorRes = await fetch(`http://localhost:3000/api/authors/${slug}`);
+        const authorRes = await fetch(`/api/authors/${slug}`);
         if (authorRes.ok) {
           const authorData = await authorRes.json();
           setAuthor(authorData.data || authorData);
         }
 
-        const articlesRes = await fetch(`http://localhost:3000/api/authors/${slug}/articles`);
+        const articlesRes = await fetch(`/api/authors/${slug}/articles`);
         if (articlesRes.ok) {
           const articlesData = await articlesRes.json();
           setArticles(articlesData.data || articlesData.rows || []);
@@ -98,8 +100,8 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
                 <div className="aspect-video bg-slate-100 relative overflow-hidden rounded-3xl mb-6 shadow-sm">
                   <img 
                     src={article.cover_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"} 
-                    alt="" 
-                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" 
+                    alt={article.title} 
+                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>
                 <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-3">

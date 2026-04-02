@@ -1,20 +1,24 @@
 "use client";
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function CategoryPage() {
+  const params = useParams();
+  const slug = params?.slug as string;
+
+  const [articles, setArticles] = useState<any[]>([]);
+  const [categoryInfo, setCategoryInfo] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [limit, setLimit] = useState(12);
 
-  const [categoryInfo, setCategoryInfo] = useState<any>(null);
-  const [articles, setArticles] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
+    if (!slug) return;
     const fetchCategoryData = async () => {
+      setIsLoading(true);
       try {
-        const catsRes = await fetch('http://localhost:3000/api/categories');
+        const catsRes = await fetch('/api/categories');
         if (catsRes.ok) {
           const catsResult = await catsRes.json();
           const allCats = catsResult.data || catsResult || [];
@@ -22,7 +26,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           setCategoryInfo(currentCat);
         }
 
-        const articlesRes = await fetch(`http://localhost:3000/api/categories/${slug}/articles`);
+        const articlesRes = await fetch(`/api/categories/${slug}/articles`);
         if (articlesRes.ok) {
           const articlesResult = await articlesRes.json();
           setArticles(articlesResult.data || articlesResult.rows || []);
@@ -47,7 +51,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
     );
   }
 
-  const info = categoryInfo || { 
+  const info = categoryInfo || {
     name: slug, 
     description: 'Перегляд публікацій за обраною категорією.' 
   };
@@ -78,7 +82,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
                   <img 
                     src={article.cover_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"} 
                     alt={article.title} 
-                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" 
+                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">

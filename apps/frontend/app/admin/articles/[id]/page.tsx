@@ -26,15 +26,15 @@ export default function EditArticlePage() {
         const token = localStorage.getItem("token");
         const headers = { "Authorization": `Bearer ${token}` };
 
-        const catRes = await fetch("http://localhost:3000/api/admin/categories", { headers });
+        const catRes = await fetch("/api/admin/categories", { headers });
         const catData = await catRes.json();
         setCategories(catData.data || []);
 
-        const tagsRes = await fetch("http://localhost:3000/api/tags");
+        const tagsRes = await fetch("/api/tags");
         const tagsData = await tagsRes.json();
         setAvailableTags(tagsData.data || tagsData || []);
 
-        const artRes = await fetch("http://localhost:3000/api/admin/articles", { headers });
+        const artRes = await fetch("/api/admin/articles", { headers });
         const artData = await artRes.json();
         const currentArticle = (artData.data || []).find((a: any) => a.id.toString() === id);
 
@@ -73,7 +73,7 @@ export default function EditArticlePage() {
     const formData = new FormData();
     formData.append("image", file);
 
-    const res = await fetch("http://localhost:3000/api/admin/upload", {
+    const res = await fetch("/api/admin/upload", {
       method: "POST",
       body: formData,
       headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
@@ -85,7 +85,7 @@ export default function EditArticlePage() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const res = await fetch(`http://localhost:3000/api/admin/articles/${id}`, {
+    const res = await fetch(`/api/admin/articles/${id}`, {
       method: "PUT",
       headers: { 
         "Content-Type": "application/json",

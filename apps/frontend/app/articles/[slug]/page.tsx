@@ -2,37 +2,35 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 
-export default function ArticleReadPage() {
-  const { slug } = useParams();
+export default function ArticlePage() {
+  const params = useParams();
+  const slug = params?.slug as string;
+
   const [article, setArticle] = useState<any>(null);
   const [related, setRelated] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!slug) return;
     const fetchArticleData = async () => {
+      setIsLoading(true);
       try {
-        const artRes = await fetch(
-          `http://localhost:3000/api/articles/${slug}`,
-        );
+        const artRes = await fetch(`/api/articles/${slug}`);
         if (artRes.ok) {
           const artData = await artRes.json();
           setArticle(artData.data || artData);
-
           if (artData.data?.id || artData.id) {
-            fetch(
-              `http://localhost:3000/api/articles/${artData.data?.id || artData.id}/view`,
-              {
-                method: "POST",
-              },
-            ).catch((e) => console.log("Помилка лічильника переглядів", e));
+            fetch(`/api/articles/${artData.data?.id || artData.id}/view`, {
+              method: "POST",
+            }).catch((e) => console.log("Помилка лічильника переглядів", e));
           }
+        } else if (artRes.status === 404) {
+          notFound();
         }
-
-        const relRes = await fetch(
-          `http://localhost:3000/api/articles/${slug}/related`,
-        );
+        const relRes = await fetch(`/api/articles/${slug}/related`);
         if (relRes.ok) {
           const relData = await relRes.json();
           setRelated(relData.data || relData || []);
@@ -43,31 +41,26 @@ export default function ArticleReadPage() {
         setIsLoading(false);
       }
     };
-
     fetchArticleData();
   }, [slug]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center font-black text-slate-300 uppercase tracking-widest">
-        Завантаження...
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
+          Завантаження статті...
+        </p>
       </div>
     );
   }
 
-  if (!article) {
-    return (
-      <div className="min-h-screen flex items-center justify-center font-black text-slate-900 text-2xl">
-        Статтю не знайдено 😕
-      </div>
-    );
-  }
+  if (!article) return notFound();
 
   return (
     <article className="min-h-screen bg-white pb-20">
       {/* ШАПКА СТАТТІ */}
       <header className="max-w-4xl mx-auto px-6 pt-20 pb-10 text-center">
-        {article.category && (
+        {article.category?.name && (
           <span className="inline-block px-4 py-1.5 mb-6 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full">
             {article.category.name || "Без категорії"}
           </span>

@@ -20,10 +20,20 @@ const nextConfig: NextConfig = {
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '3000',
+        port: '3001',
         pathname: '/uploads/**',
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        // The BACKEND_URL is set in docker-compose for production, 
+        // and in .env.local for local development
+        destination: `${process.env.BACKEND_URL}/api/:path*`,
+      },
+    ]
   },
 };
 

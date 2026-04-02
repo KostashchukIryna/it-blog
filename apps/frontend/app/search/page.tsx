@@ -17,7 +17,7 @@ function SearchContent() {
       
       setIsLoading(true);
       try {
-        const res = await fetch(`http://localhost:3000/api/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
         const result = await res.json();
         
         setArticles(result.data || result.rows || []);
@@ -57,8 +57,8 @@ function SearchContent() {
               <div className="aspect-video bg-slate-100 relative overflow-hidden rounded-3xl mb-6 shadow-sm">
                 <img 
                   src={article.cover_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"} 
-                  alt="" 
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" 
+                  alt={article.title} 
+                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <h2 className="text-2xl font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
