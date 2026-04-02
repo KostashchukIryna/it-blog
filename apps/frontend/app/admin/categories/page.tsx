@@ -11,7 +11,7 @@ export default function AdminCategories() {
 
   const loadCategories = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/admin/categories", {
+      const res = await fetch("/api/admin/categories", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const result = await res.json();
@@ -29,7 +29,7 @@ export default function AdminCategories() {
     e.preventDefault();
     if (!newName.trim()) return;
 
-    const res = await fetch("http://localhost:3000/api/admin/categories", {
+    const res = await fetch("/api/admin/categories", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +46,7 @@ export default function AdminCategories() {
 
   const handleUpdate = async (id: number) => {
     const res = await fetch(
-      `http://localhost:3000/api/admin/categories/${id}`,
+      `/api/admin/categories/${id}`,
       {
         method: "PUT",
         headers: {
@@ -67,7 +67,7 @@ export default function AdminCategories() {
     if (!confirm("Видалити цю категорію?")) return;
 
     const res = await fetch(
-      `http://localhost:3000/api/admin/categories/${id}`,
+      `/api/admin/categories/${id}`,
       {
         method: "DELETE",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

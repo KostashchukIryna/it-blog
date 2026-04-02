@@ -5,7 +5,7 @@ import AdminButton from "./AdminButton";
 export default async function Navbar() {
   let categories = [];
   try {
-    const res = await fetch("http://localhost:3000/api/categories", { cache: "no-store" });
+    const res = await fetch("/api/categories", { cache: "no-store" });
     if (res.ok) {
       const result = await res.json();
       categories = result.data || result || [];

@@ -14,7 +14,7 @@ export default function TagPage({ params }: { params: Promise<{ slug: string }> 
   useEffect(() => {
     const fetchTagData = async () => {
       try {
-        const tagsRes = await fetch('http://localhost:3000/api/tags');
+        const tagsRes = await fetch('/api/tags');
         if (tagsRes.ok) {
           const tagsResult = await tagsRes.json();
           const allTags = tagsResult.data || tagsResult || [];
@@ -22,7 +22,7 @@ export default function TagPage({ params }: { params: Promise<{ slug: string }> 
           setTagInfo(currentTag);
         }
 
-        const articlesRes = await fetch(`http://localhost:3000/api/tags/${slug}/articles`);
+        const articlesRes = await fetch(`/api/tags/${slug}/articles`);
         if (articlesRes.ok) {
           const articlesResult = await articlesRes.json();
           setArticles(articlesResult.data || articlesResult.rows || []);
