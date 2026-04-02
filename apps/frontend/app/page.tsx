@@ -1,31 +1,55 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// Mock data
-const ALL_ARTICLES = Array.from({ length: 143 }).map((_, i) => ({
-  id: i + 1,
-  title: i === 0 ? "Майбутнє штучного інтелекту у 2026 році" : `Цікава новина про IT №${i + 1}`,
-  slug: `news-${i + 1}`,
-  info: "Дізнайтеся, як нові технології змінюють світ розробки та які навички будуть критично важливими...",
-  category: i % 4 === 0 ? "JavaScript" : i % 4 === 1 ? "Backend" : i % 4 === 2 ? "Штучний інтелект" : "Кібербезпека",
-  author: "Олександр Технік",
-  date: "30 Березня, 2026",
-  image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400" 
-}));
-
 export default function HomePage() {
-  // Active category state
+  const [articles, setArticles] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Всі');
   const [limit, setLimit] = useState(12);
 
-  const categories = ['Всі', 'JavaScript', 'Backend', 'Штучний інтелект', 'Кібербезпека'];
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [artRes, catRes] = await Promise.all([
+          fetch("/api/articles"),
+          fetch("/api/categories"),
+        ]);
 
-  // Filter array by category
-  const filteredArticles = ALL_ARTICLES.filter(article => 
-    activeCategory === 'Всі' || article.category === activeCategory
-  );
+        const artResult = await artRes.json();
+        const catResult = await catRes.json();
+
+        setArticles(artResult.data || []);
+
+        const realCategories = catResult.data || catResult || [];
+        setCategories(["Всі", ...realCategories.map((c: any) => c.name)]);
+      } catch (error) {
+        console.error("Помилка завантаження даних:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="bg-white min-h-screen flex items-center justify-center">
+        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
+          Завантаження...
+        </p>
+      </div>
+    );
+  }
+
+  const filteredArticles = articles.filter((article: any) => {
+    if (activeCategory === "Всі") return true;
+    return article.category?.name === activeCategory;
+  });
 
   const visibleArticles = filteredArticles.slice(0, limit);
 
@@ -72,14 +96,14 @@ export default function HomePage() {
             <article key={article.id} className="group border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
               <div className="aspect-video bg-slate-200 relative overflow-hidden">
                 <img 
-                  src={article.image} 
-                  alt="" 
+                  src={article.cover_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"} 
+                  alt={article.title} 
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" 
                 />
               </div>
               <div className="p-6">
                 <span className="text-blue-600 text-[10px] font-bold uppercase tracking-widest">
-                  {article.category}
+                  {article.category?.name || "Без категорії"}
                 </span>
                 <h2 className="text-xl font-bold mt-2 leading-tight">
                   <Link href={`/articles/${article.slug}`} className="hover:text-blue-600 transition-colors">
@@ -87,7 +111,7 @@ export default function HomePage() {
                   </Link>
                 </h2>
                 <p className="text-slate-500 text-sm mt-3 line-clamp-2">
-                  {article.info}
+                  {article.excerpt}
                 </p>
               </div>
             </article>
