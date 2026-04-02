@@ -23,11 +23,11 @@ export default function NewArticlePage() {
       const headers = { "Authorization": `Bearer ${localStorage.getItem("token")}` };
       
       try {
-        const catRes = await fetch("http://localhost:3000/api/admin/categories", { headers });
+        const catRes = await fetch("/api/admin/categories", { headers });
         const catData = await catRes.json();
         setCategories(catData.data || []);
 
-        const tagsRes = await fetch("http://localhost:3000/api/tags");
+        const tagsRes = await fetch("/api/tags");
         const tagsData = await tagsRes.json();
         setAvailableTags(tagsData.data || tagsData || []);
       } catch (err) {
@@ -54,7 +54,7 @@ export default function NewArticlePage() {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:3000/api/admin/upload", {
+      const res = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData,
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
@@ -73,7 +73,7 @@ export default function NewArticlePage() {
 
     const finalExcerpt = excerpt.trim() || content.substring(0, 150).replace(/[#*]/g, "") + "...";
 
-    const res = await fetch("http://localhost:3000/api/admin/articles", {
+    const res = await fetch("/api/admin/articles", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

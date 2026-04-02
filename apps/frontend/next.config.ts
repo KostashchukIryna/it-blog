@@ -23,6 +23,13 @@ const nextConfig: NextConfig = {
         port: '3001',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        // ЗАМІНІТЬ ЦЕ на реальну адресу вашого БЕКЕНД-сервісу на Railway
+        hostname: 'capable-balance-production.up.railway.app/',
+        port: '',
+        pathname: '/uploads/**',
+      },
     ],
   },
   async rewrites() {
