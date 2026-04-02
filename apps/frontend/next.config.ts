@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         // ЗАМІНІТЬ ЦЕ на реальну адресу вашого БЕКЕНД-сервісу на Railway
-        hostname: 'capable-balance-production.up.railway.app/',
+        hostname: 'capable-balance-production.up.railway.app', // Без кінцевого слеша
         port: '',
         pathname: '/uploads/**',
       },
