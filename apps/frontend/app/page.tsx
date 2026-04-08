@@ -65,7 +65,6 @@ export default function HomePage() {
             Останні публікації
           </h1>
 
-          {/* Filter buttons */}
           <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((cat) => (
               <button 
@@ -90,7 +89,6 @@ export default function HomePage() {
           </p>
         </header>
 
-        {/* Posts grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {visibleArticles.map((article) => (
             <article key={article.id} className="group border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
@@ -118,7 +116,6 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* LOAD MORE POSTS */}
         {limit < filteredArticles.length && (
           <div className="mt-20 text-center">
             <button 
@@ -130,7 +127,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* NO MORE POSTS TO SHOW */}
         {(limit >= filteredArticles.length || filteredArticles.length === 0) && (
           <div className="mt-20 text-center py-10 border-t border-slate-50">
             <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">

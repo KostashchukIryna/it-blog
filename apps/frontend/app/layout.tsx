@@ -25,7 +25,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-grow">{children}</main>
         <footer className="p-4 border-t text-center text-xs text-gray-400">
-          IT Blog - 2026
+          Blog.IT - 2026
         </footer>
       </body>
     </html>

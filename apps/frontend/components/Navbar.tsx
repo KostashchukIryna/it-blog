@@ -18,12 +18,14 @@ export default async function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-black text-blue-600 tracking-tighter">
+        <Link
+          href="/"
+          className="text-2xl font-black text-blue-600 tracking-tighter"
+        >
           BLOG.IT
         </Link>
-        
+
         <div className="hidden md:flex space-x-8 items-center">
-          {/* Динамічні категорії */}
           {categories.map((item: any) => (
             <Link
               key={item.slug}
@@ -34,10 +36,9 @@ export default async function Navbar() {
             </Link>
           ))}
 
-          {/* Розділювач та лінк "Про нас" */}
           {categories.length > 0 && <span className="text-slate-200">|</span>}
-          <Link 
-            href="/about" 
+          <Link
+            href="/about"
             className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-colors"
           >
             Про нас
