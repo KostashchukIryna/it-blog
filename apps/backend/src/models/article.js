@@ -5,7 +5,7 @@ const ARTICLE_SELECT = `
   a.id, a.title, a.slug, a.excerpt, a.content, a.cover_url,
   a.status, a.views, a.meta_title, a.meta_description,
   a.published_at, a.created_at, a.updated_at,
-  json_build_object('id', u.id, 'name', u.name, 'slug', u.slug, 'avatar_url', u.avatar_url) AS author,
+  json_build_object('id', u.id, 'name', u.name, 'slug', u.slug, 'avatar_url', u.avatar_url, 'bio', u.bio, 'social_links', u.social_links) AS author,
   json_build_object('id', c.id, 'name', c.name, 'slug', c.slug) AS category,
   COALESCE(
     json_agg(DISTINCT jsonb_build_object('id', t.id, 'name', t.name, 'slug', t.slug))
