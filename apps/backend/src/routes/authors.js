@@ -3,6 +3,7 @@ const ctrl = require("../controllers/authors");
 
 const router = Router();
 
+router.get("/",               ctrl.list);
 router.get("/:slug",          ctrl.getProfile);
 router.get("/:slug/articles", ctrl.getArticles);
 

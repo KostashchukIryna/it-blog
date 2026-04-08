@@ -3,6 +3,16 @@ const Article = require("../models/article");
 const { ok, paginated, notFound, serverError } = require("../response");
 const { parsePagination } = require("../pagination");
 
+/** GET /api/authors */
+const list = async (req, res) => {
+  try {
+    const authors = await User.findAll();
+    return ok(res, authors);
+  } catch (err) {
+    return serverError(res, err);
+  }
+};
+
 /** GET /api/authors/:slug */
 const getProfile = async (req, res) => {
   try {
@@ -30,4 +40,4 @@ const getArticles = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, getArticles };
+module.exports = { list, getProfile, getArticles };

@@ -16,21 +16,29 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   try {
     /* ── Users ─────────────────────────────────────────────────── */
     const [admin] = (await db.query(
-      `INSERT INTO users (name, slug, email, password, bio, is_admin)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       ON CONFLICT (email) DO UPDATE SET name=EXCLUDED.name
+      `INSERT INTO users (name, slug, email, password, bio, is_admin, social_links)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (email) DO UPDATE SET name=EXCLUDED.name, bio=EXCLUDED.bio, social_links=EXCLUDED.social_links
        RETURNING id`,
       ["Admin User", "admin", "admin@example.com",
-       await hash("secret123"), "Blog administrator", true]
+       await hash("secret123"), "Blog administrator and senior software architect with 10+ years of experience in full-stack development. Passionate about modern web technologies, DevOps practices, and building scalable applications.", true,
+       JSON.stringify({
+         "linkedin": "https://linkedin.com/in/admin-user",
+         "github": "https://github.com/admin-user"
+       })]
     )).rows;
 
     const [author] = (await db.query(
-      `INSERT INTO users (name, slug, email, password, bio)
-       VALUES ($1, $2, $3, $4, $5)
-       ON CONFLICT (email) DO UPDATE SET name=EXCLUDED.name
+      `INSERT INTO users (name, slug, email, password, bio, social_links)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (email) DO UPDATE SET name=EXCLUDED.name, bio=EXCLUDED.bio, social_links=EXCLUDED.social_links
        RETURNING id`,
       ["Jane Doe", "jane-doe", "jane@example.com",
-       await hash("secret123"), "Full-stack developer & tech writer"]
+       await hash("secret123"), "Full-stack developer & tech writer with expertise in React, Node.js, and cloud architecture. Loves creating educational content and contributing to open source projects.",
+       JSON.stringify({
+         "linkedin": "https://linkedin.com/in/jane-doe-dev",
+         "github": "https://github.com/jane-doe"
+       })]
     )).rows;
 
     /* ── Categories ────────────────────────────────────────────── */
