@@ -69,17 +69,47 @@ export default function AuthorPage() {
             )}
           </div>
           
-          {/* Info */}
           <div className="text-center md:text-left flex-1">
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-3">
               {author.name}
             </h1>
-            <p className="text-blue-600 font-bold uppercase tracking-widest text-xs mb-6 ml-[3px]">
-              {author.role || "Автор блогу"}
+            
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4 ml-[3px]">
+              <p className="text-blue-600 font-bold uppercase tracking-widest text-xs">
+                Автор блогу
+              </p>
+              <span className="text-slate-300">•</span>
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">
+                Статей: {articles.length}
+              </p>
+            </div>
+
+            <p className="text-slate-600 text-lg leading-relaxed max-w-2xl ml-[3px] mb-6">
+              {author.bio || "Цей автор ще не додав інформацію про себе."}
             </p>
-            <p className="text-slate-600 text-lg leading-relaxed max-w-2xl ml-[3px]">
-              {author.bio || "Цей автор ще не додав розгорнуту інформацію про себе."}
-            </p>
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 ml-[3px]">
+              {author.social_links?.github && (
+                <a 
+                  href={author.social_links.github} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-5 py-2 bg-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                  GitHub
+                </a>
+              )}
+              {author.social_links?.linkedin && (
+                <a 
+                  href={author.social_links.linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-5 py-2 bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                  LinkedIn
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -105,7 +135,6 @@ export default function AuthorPage() {
                   />
                 </div>
                 <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
-                  {/* Беремо ім'я категорії з об'єкта */}
                   {article.category?.name || "Без категорії"}
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
