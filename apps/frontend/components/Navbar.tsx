@@ -23,6 +23,7 @@ export default async function Navbar() {
         </Link>
         
         <div className="hidden md:flex space-x-8 items-center">
+          {/* Динамічні категорії */}
           {categories.map((item: any) => (
             <Link
               key={item.slug}
@@ -32,6 +33,15 @@ export default async function Navbar() {
               {item.name}
             </Link>
           ))}
+
+          {/* Розділювач та лінк "Про нас" */}
+          {categories.length > 0 && <span className="text-slate-200">|</span>}
+          <Link 
+            href="/about" 
+            className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-colors"
+          >
+            Про нас
+          </Link>
         </div>
 
         <div className="flex items-center space-x-4">
