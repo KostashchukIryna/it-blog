@@ -12,6 +12,28 @@ const hash = (p) => bcrypt.hash(p, 10);
 // Допоміжна функція, щоб не перевантажувати API Unsplash запитами
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Набір заготовлених якісних зображень з офіційного API Unsplash для статей
+const TECH_IMAGES = [
+  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1280&q=80",
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1280&q=80",
+  "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1280&q=80",
+  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1280&q=80",
+  "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=1280&q=80",
+  "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=1280&q=80",
+  "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1280&q=80",
+  "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1280&q=80",
+  "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1280&q=80",
+  "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=1280&q=80",
+  "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1280&q=80",
+  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1280&q=80",
+  "https://images.unsplash.com/photo-1505238680356-667804448ae6?w=1280&q=80",
+  "https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?w=1280&q=80",
+  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1280&q=80",
+  "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1280&q=80",
+  "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1280&q=80",
+  "https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?w=1280&q=80"
+];
+
 (async () => {
   try {
     /* ── Users ─────────────────────────────────────────────────── */
@@ -291,29 +313,16 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
       },
     ];
 
+    let imageIndex = 0;
     for (const a of articles) {
       const { tags, ...fields } = a; // 'tags' - це масив рядків, 'fields' - решта полів статті
 
       // Генеруємо тематичну URL-адресу для обкладинки, якщо вона не вказана
       if (!fields.cover_url) {
-        try {
-          const categorySlug = categorySlugById[fields.category_id] || 'technology';
-          const tagKeywords = tags.slice(0, 2).join(','); // Беремо перші два теги
-          const keywords = [categorySlug, tagKeywords].filter(Boolean).join(',');
-          const unsplashUrl = `https://source.unsplash.com/random/1280x720/?${keywords}`;
-
-          // Робимо запит і отримуємо фінальну URL-адресу після редиректу
-          const response = await fetch(unsplashUrl);
-          if (response.ok) {
-            fields.cover_url = response.url;
-            console.log(`   └─ Отримано обкладинку для "${fields.title}" за ключовими словами: ${keywords}`);
-          } else {
-            console.warn(`   └─ Не вдалося отримати обкладинку для "${fields.title}". Статус: ${response.status}`);
-          }
-          await sleep(250); // Невелика затримка, щоб не спамити API
-        } catch (fetchError) {
-            console.error(`   └─ Помилка при завантаженні обкладинки для "${fields.title}":`, fetchError.message);
-        }
+        // Беремо унікальне зображення з масиву по порядку без повторів
+        fields.cover_url = TECH_IMAGES[imageIndex % TECH_IMAGES.length];
+        imageIndex++;
+        console.log(`   └─ Встановлено обкладинку для "${fields.title}"`);
       }
 
       const { rows } = await db.query(

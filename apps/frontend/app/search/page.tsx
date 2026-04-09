@@ -1,42 +1,25 @@
-"use client";
-
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-function SearchContent() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get('q');
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }> | { q?: string };
+}) {
+  const resolvedSearchParams = await searchParams;
+  const query = resolvedSearchParams?.q || '';
+  const API_URL = process.env.BACKEND_URL || 'http://localhost:3001';
   
-  const [articles, setArticles] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  let articles = [];
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (!query) return;
+  if (query) {
+    try {
+      const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(query)}`, { cache: 'no-store' });
+      const result = await res.json();
       
-      setIsLoading(true);
-      try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-        const result = await res.json();
-        
-        setArticles(result.data || result.rows || []);
-      } catch (error) {
-        console.error("Search error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [query]);
-
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <p className="text-slate-300 font-black uppercase tracking-widest animate-pulse">Шукаємо «{query}»...</p>
-      </div>
-    );
+      articles = result.data || result.rows || [];
+    } catch (error) {
+      console.error("Search error:", error);
+    }
   }
 
   return (
@@ -74,12 +57,5 @@ function SearchContent() {
         </div>
       )}
     </main>
-  );
-}
-export default function SearchPage() {
-  return (
-    <Suspense fallback={<div className="p-20 text-center">Завантаження...</div>}>
-      <SearchContent />
-    </Suspense>
   );
 }

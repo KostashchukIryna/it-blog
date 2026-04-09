@@ -1,54 +1,35 @@
-"use client";
-
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function CategoryPage() {
-  const params = useParams();
-  const slug = params?.slug as string;
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }> | { slug: string };
+  searchParams: Promise<{ limit?: string }> | { limit?: string };
+}) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  const slug = resolvedParams.slug;
+  const limit = parseInt(resolvedSearchParams?.limit || '12', 10);
+  const API_URL = process.env.BACKEND_URL || 'http://localhost:3001';
 
-  const [articles, setArticles] = useState<any[]>([]);
-  const [categoryInfo, setCategoryInfo] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [limit, setLimit] = useState(12);
+  let articles = [];
+  let categoryInfo = null;
 
-  useEffect(() => {
-    if (!slug) return;
-    const fetchCategoryData = async () => {
-      setIsLoading(true);
-      try {
-        const catsRes = await fetch('/api/categories');
-        if (catsRes.ok) {
-          const catsResult = await catsRes.json();
-          const allCats = catsResult.data || catsResult || [];
-          const currentCat = allCats.find((c: any) => c.slug === slug);
-          setCategoryInfo(currentCat);
-        }
+  try {
+    const [catsRes, articlesRes] = await Promise.all([
+      fetch(`${API_URL}/api/categories`, { cache: 'no-store' }),
+      fetch(`${API_URL}/api/categories/${slug}/articles`, { cache: 'no-store' })
+    ]);
 
-        const articlesRes = await fetch(`/api/categories/${slug}/articles`);
-        if (articlesRes.ok) {
-          const articlesResult = await articlesRes.json();
-          setArticles(articlesResult.data || articlesResult.rows || []);
-        }
-      } catch (error) {
-        console.error("Помилка завантаження категорії:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    const catsResult = await catsRes.json();
+    const allCats = catsResult.data || catsResult || [];
+    categoryInfo = allCats.find((c: any) => c.slug === slug);
 
-    fetchCategoryData();
-  }, [slug]);
-
-  if (isLoading) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
-          Завантаження...
-        </p>
-      </div>
-    );
+    const articlesResult = await articlesRes.json();
+    articles = articlesResult.data || articlesResult.rows || [];
+  } catch (error) {
+    console.error("Помилка завантаження категорії:", error);
   }
 
   const info = categoryInfo || {
@@ -102,12 +83,12 @@ export default function CategoryPage() {
 
         {limit < articles.length && (
           <div className="mt-20 text-center">
-            <button 
-              onClick={() => setLimit(prev => prev + 12)}
-              className="px-12 py-5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-blue-600 transition-all shadow-2xl hover:-translate-y-1 active:scale-95"
+            <Link 
+              href={`/categories/${slug}?limit=${limit + 12}`}
+              className="inline-block px-12 py-5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-blue-600 transition-all shadow-2xl hover:-translate-y-1 active:scale-95"
             >
               Завантажити ще статті
-            </button>
+            </Link>
           </div>
         )}
 

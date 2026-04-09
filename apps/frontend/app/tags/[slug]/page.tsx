@@ -1,51 +1,52 @@
-"use client";
+import { notFound } from "next/navigation";
+import Link from "next/link";
 
-import { useState, useEffect, use } from 'react';
-import Link from 'next/link';
+const API_URL = process.env.BACKEND_URL || 'http://localhost:3001';
 
-export default function TagPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
-  const [limit, setLimit] = useState(12);
-
-  const [tagInfo, setTagInfo] = useState<any>(null);
-  const [articles, setArticles] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchTagData = async () => {
-      try {
-        const tagsRes = await fetch('/api/tags');
-        if (tagsRes.ok) {
-          const tagsResult = await tagsRes.json();
-          const allTags = tagsResult.data || tagsResult || [];
-          const currentTag = allTags.find((t: any) => t.slug === slug);
-          setTagInfo(currentTag);
-        }
-
-        const articlesRes = await fetch(`/api/tags/${slug}/articles`);
-        if (articlesRes.ok) {
-          const articlesResult = await articlesRes.json();
-          setArticles(articlesResult.data || articlesResult.rows || []);
-        }
-      } catch (error) {
-        console.error("Помилка завантаження тегу:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTagData();
-  }, [slug]);
-
-  if (isLoading) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
-          Завантаження...
-        </p>
-      </div>
-    );
+async function getTag(slug: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/tags`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const allTags = data.data || data || [];
+    return allTags.find((t: any) => t.slug === slug);
+  } catch (error) {
+    console.error("Помилка завантаження тегу:", error);
+    return null;
   }
+}
+
+async function getArticles(slug: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/tags/${slug}/articles`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || data.rows || [];
+  } catch (error) {
+    console.error("Помилка завантаження статей:", error);
+    return [];
+  }
+}
+
+export default async function TagPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }> | { slug: string };
+  searchParams: Promise<{ limit?: string }> | { limit?: string };
+}) {
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
+
+  const resolvedSearchParams = await searchParams;
+  const limit = parseInt(resolvedSearchParams?.limit || '12', 10);
+
+  if (!slug) return notFound();
+
+  const [tagInfo, articles] = await Promise.all([
+    getTag(slug),
+    getArticles(slug),
+  ]);
 
   const tagName = tagInfo?.name || slug;
   const visibleArticles = articles.slice(0, limit);
@@ -112,12 +113,12 @@ export default function TagPage({ params }: { params: Promise<{ slug: string }> 
 
         {limit < articles.length && (
           <div className="mt-20 text-center">
-            <button 
-              onClick={() => setLimit(prev => prev + 12)}
-              className="px-12 py-5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-blue-600 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
+            <Link 
+              href={`/tags/${slug}?limit=${limit + 12}`}
+              className="inline-block px-12 py-5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-blue-600 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
             >
               Завантажити ще статті
-            </button>
+            </Link>
           </div>
         )}
       </div>
