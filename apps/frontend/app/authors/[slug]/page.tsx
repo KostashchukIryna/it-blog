@@ -1,64 +1,58 @@
-"use client";
+import { notFound } from "next/navigation";
+import Link from "next/link";
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
+const API_URL = process.env.BACKEND_URL || 'http://localhost:3001';
 
-export default function AuthorPage() {
-  const { slug } = useParams();
+async function getAuthor(slug: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/authors/${slug}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.data || data;
+  } catch (error) {
+    console.error("Помилка завантаження автора:", error);
+    return null;
+  }
+}
+
+async function getArticles(slug: string) {
+  try {
+    const res = await fetch(`${API_URL}/api/authors/${slug}/articles`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || data.rows || [];
+  } catch (error) {
+    console.error("Помилка завантаження статей:", error);
+    return [];
+  }
+}
+
+export default async function AuthorPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }> | { slug: string };
+  searchParams: Promise<{ limit?: string }> | { limit?: string };
+}) {
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
   
-  const [author, setAuthor] = useState<any>(null);
-  const [articles, setArticles] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  const [limit, setLimit] = useState(12);
+  const resolvedSearchParams = await searchParams;
+  const limit = parseInt(resolvedSearchParams?.limit || '12', 10);
 
-  useEffect(() => {
-    const fetchAuthorData = async () => {
-      if (!slug) return;
-      try {
-        const authorRes = await fetch(`/api/authors/${slug}`);
-        if (authorRes.ok) {
-          const authorData = await authorRes.json();
-          setAuthor(authorData.data || authorData);
-        }
+  if (!slug) return notFound();
 
-        const articlesRes = await fetch(`/api/authors/${slug}/articles`);
-        if (articlesRes.ok) {
-          const articlesData = await articlesRes.json();
-          setArticles(articlesData.data || articlesData.rows || []);
-        }
-      } catch (error) {
-        console.error("Помилка завантаження:", error);
-      } finally {
-        setIsLoading(false); 
-      }
-    };
+  const [author, articles] = await Promise.all([
+    getAuthor(slug),
+    getArticles(slug),
+  ]);
 
-    fetchAuthorData();
-  }, [slug]);
+  if (!author) return notFound();
 
   const visibleArticles = articles.slice(0, limit);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-2xl font-bold text-slate-300 uppercase tracking-widest">Завантаження профілю...</p>
-      </div>
-    );
-  }
-
-  if (!author) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-2xl font-bold text-slate-400">Автора не знайдено ^_^</p>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white min-h-screen">
-      
       <section className="bg-slate-50 border-b border-slate-100 pt-20 pb-16 px-6">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-8">
           <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-900 flex items-center justify-center text-white text-6xl font-black">
@@ -147,16 +141,15 @@ export default function AuthorPage() {
 
         {limit < articles.length && (
           <div className="mt-20 text-center">
-            <button 
-              onClick={() => setLimit(prev => prev + 12)}
-              className="px-12 py-5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-blue-600 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
+            <Link 
+              href={`/authors/${slug}?limit=${limit + 12}`}
+              className="inline-block px-12 py-5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-blue-600 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
             >
               Більше статей
-            </button>
+            </Link>
           </div>
         )}
       </section>
-      
     </div>
   );
 }

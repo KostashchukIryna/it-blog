@@ -35,6 +35,10 @@ export default function LoginPage() {
           
           const role = user.is_admin ? "admin" : "user";
           localStorage.setItem("user_role", role);
+          
+          // Зберігаємо в Cookies для Server-Side Rendering (SSR) та Middleware
+          document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
+          document.cookie = `user_role=${role}; path=/; max-age=86400; SameSite=Lax`;
 
           router.push("/admin/dashboard");
         } else {

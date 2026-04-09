@@ -1,49 +1,32 @@
-"use client";
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-export default function HomePage() {
-  const [articles, setArticles] = useState<any[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('Всі');
-  const [limit, setLimit] = useState(12);
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string; limit?: string }> | { category?: string; limit?: string };
+}) {
+  const resolvedSearchParams = await searchParams;
+  const activeCategory = resolvedSearchParams?.category || 'Всі';
+  const limit = parseInt(resolvedSearchParams?.limit || '12', 10);
+  const API_URL = process.env.BACKEND_URL || 'http://localhost:3001';
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [artRes, catRes] = await Promise.all([
-          fetch("/api/articles"),
-          fetch("/api/categories"),
-        ]);
+  let articles = [];
+  let categories = ["Всі"];
 
-        const artResult = await artRes.json();
-        const catResult = await catRes.json();
+  try {
+    const [artRes, catRes] = await Promise.all([
+      fetch(`${API_URL}/api/articles`, { cache: 'no-store' }),
+      fetch(`${API_URL}/api/categories`, { cache: 'no-store' }),
+    ]);
 
-        setArticles(artResult.data || []);
+    const artResult = await artRes.json();
+    const catResult = await catRes.json();
 
-        const realCategories = catResult.data || catResult || [];
-        setCategories(["Всі", ...realCategories.map((c: any) => c.name)]);
-      } catch (error) {
-        console.error("Помилка завантаження даних:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
-          Завантаження...
-        </p>
-      </div>
-    );
+    articles = artResult.data || [];
+    const realCategories = catResult.data || catResult || [];
+    categories = ["Всі", ...realCategories.map((c: any) => c.name)];
+  } catch (error) {
+    console.error("Помилка завантаження даних:", error);
   }
 
   const filteredArticles = articles.filter((article: any) => {
@@ -52,10 +35,6 @@ export default function HomePage() {
   });
 
   const visibleArticles = filteredArticles.slice(0, limit);
-
-  const showMore = () => {
-    setLimit((prev) => prev + 12);
-  };
 
   return (
     <div className="bg-white min-h-screen">
@@ -67,20 +46,17 @@ export default function HomePage() {
 
           <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((cat) => (
-              <button 
+              <Link 
                 key={cat}
-                onClick={() => {
-                  setActiveCategory(cat);
-                  setLimit(12);
-                }}
-                className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
+                href={`/?category=${encodeURIComponent(cat)}&limit=12`}
+                className={`inline-block px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
                   activeCategory === cat 
                     ? 'bg-slate-900 text-white border-slate-900' 
                     : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'
                 }`}
               >
                 {cat}
-              </button>
+              </Link>
             ))}
           </div>
 
@@ -90,7 +66,7 @@ export default function HomePage() {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {visibleArticles.map((article) => (
+          {visibleArticles.map((article: any) => (
             <article key={article.id} className="group border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
               <div className="aspect-video bg-slate-200 relative overflow-hidden">
                 <img 
@@ -118,12 +94,12 @@ export default function HomePage() {
 
         {limit < filteredArticles.length && (
           <div className="mt-20 text-center">
-            <button 
-              onClick={showMore}
-              className="px-12 py-5 uppercase bg-slate-900 text-white text-xs font-black rounded-[25px] hover:bg-blue-600 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
+            <Link 
+              href={`/?category=${encodeURIComponent(activeCategory)}&limit=${limit + 12}`}
+              className="inline-block px-12 py-5 uppercase bg-slate-900 text-white text-xs font-black rounded-[25px] hover:bg-blue-600 transition-all shadow-xl hover:-translate-y-1 active:scale-95"
             >
               Завантажити ще
-            </button>
+            </Link>
           </div>
         )}
 
