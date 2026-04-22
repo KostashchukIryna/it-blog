@@ -1,57 +1,45 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-export default function ArticlePage() {
-  const params = useParams();
-  const slug = params?.slug as string;
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ slug: string }> | { slug: string };
+}) {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  const API_URL = process.env.BACKEND_URL || "http://localhost:3001";
 
-  const [article, setArticle] = useState<any>(null);
-  const [related, setRelated] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  let article: any = null;
+  let related: any[] = [];
 
-  useEffect(() => {
-    if (!slug) return;
-    const fetchArticleData = async () => {
-      setIsLoading(true);
-      try {
-        const artRes = await fetch(`/api/articles/${slug}`);
-        if (artRes.ok) {
-          const artData = await artRes.json();
-          setArticle(artData.data || artData);
-          if (artData.data?.id || artData.id) {
-            fetch(`/api/articles/${artData.data?.id || artData.id}/view`, {
-              method: "POST",
-            }).catch((e) => console.log("Помилка лічильника переглядів", e));
-          }
-        } else if (artRes.status === 404) {
-          notFound();
-        }
-        const relRes = await fetch(`/api/articles/${slug}/related`);
-        if (relRes.ok) {
-          const relData = await relRes.json();
-          setRelated(relData.data || relData || []);
-        }
-      } catch (error) {
-        console.error("Помилка завантаження статті:", error);
-      } finally {
-        setIsLoading(false);
+  try {
+    const artRes = await fetch(`${API_URL}/api/articles/${slug}`, { cache: "no-store" });
+    
+    if (artRes.status === 404) {
+      notFound();
+    }
+
+    if (artRes.ok) {
+      const artData = await artRes.json();
+      article = artData.data || artData;
+
+      // Збільшуємо лічильник переглядів (Fire and forget запит)
+      if (article?.id) {
+        fetch(`${API_URL}/api/articles/${article.id}/view`, {
+          method: "POST",
+          cache: "no-store"
+        }).catch((e) => console.log("Помилка лічильника переглядів", e));
       }
-    };
-    fetchArticleData();
-  }, [slug]);
+    }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-2xl font-black text-slate-300 uppercase tracking-widest">
-          Завантаження статті...
-        </p>
-      </div>
-    );
+    const relRes = await fetch(`${API_URL}/api/articles/${slug}/related`, { cache: "no-store" });
+    if (relRes.ok) {
+      const relData = await relRes.json();
+      related = relData.data || relData || [];
+    }
+  } catch (error) {
+    console.error("Помилка завантаження статті:", error);
   }
 
   if (!article) return notFound();
@@ -137,16 +125,6 @@ export default function ArticlePage() {
               src={article.cover_url}
               alt={article.title}
               className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                e.currentTarget.parentElement!.classList.add(
-                  "flex",
-                  "items-center",
-                  "justify-center",
-                );
-                e.currentTarget.parentElement!.innerHTML =
-                  '<span class="text-slate-300 font-black text-2xl">Зображення недоступне</span>';
-              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -226,16 +204,6 @@ export default function ArticlePage() {
                         src={rel.cover_url}
                         alt={rel.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                          e.currentTarget.parentElement!.classList.add(
-                            "flex",
-                            "items-center",
-                            "justify-center",
-                          );
-                          e.currentTarget.parentElement!.innerHTML =
-                            '<span class="text-slate-300 font-black text-[10px] uppercase tracking-widest">Немає фото</span>';
-                        }}
                       />
                     ) : null}
                   </div>

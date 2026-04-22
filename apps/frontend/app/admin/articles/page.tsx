@@ -1,47 +1,40 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
-export default function ArticlesPage() {
-  const [articles, setArticles] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default async function ArticlesPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  const API_URL = process.env.BACKEND_URL || "http://localhost:3001";
+  
+  let articles: any[] = [];
 
-  const loadArticles = async () => {
-    setIsLoading(true);
+  try {
+    const res = await fetch(`${API_URL}/api/admin/articles`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store'
+    });
+    const result = await res.json();
+    articles = result.data || [];
+  } catch (e) {
+    console.error("Помилка завантаження статей:", e);
+  }
+
+  async function deleteArticle(formData: FormData) {
+    "use server";
+    const id = formData.get("id");
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (!token || !id) return;
+
     try {
-      const res = await fetch("/api/admin/articles", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      const result = await res.json();
-      
-      setArticles(result.data || []);
-    } catch (e) {
-      console.error("Помилка завантаження статей:", e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadArticles();
-  }, []);
-
-  const handleDelete = async (id: number) => {
-    if (!confirm("Ви впевнені, що хочете видалити цю статтю назавжди?")) return;
-
-    try {
-      const res = await fetch(`/api/admin/articles/${id}`, {
+      const BACKEND = process.env.BACKEND_URL || "http://localhost:3001";
+      await fetch(`${BACKEND}/api/admin/articles/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (res.ok) {
-        await loadArticles();
-      } else {
-        const errorData = await res.json();
-        alert(`Помилка видалення: ${errorData.message || 'Невідома помилка'}`);
-      }
+      revalidatePath("/admin/articles");
     } catch (e) {
       console.error("Помилка мережі при видаленні:", e);
     }
@@ -78,11 +71,7 @@ export default function ArticlesPage() {
           </div>
 
           <div className="divide-y divide-slate-50">
-            {isLoading ? (
-              <div className="py-10 text-center font-black text-slate-300 uppercase tracking-widest text-[10px]">
-                Завантаження даних...
-              </div>
-            ) : articles.length === 0 ? (
+            {articles.length === 0 ? (
               <div className="py-10 text-center font-bold text-slate-400 text-sm">
                 Статей ще немає. Натисніть "+ Створити статтю", щоб додати першу.
               </div>
@@ -108,12 +97,15 @@ export default function ArticlesPage() {
                       Редагувати
                     </Link>
                     
-                    <button 
-                      onClick={() => handleDelete(article.id)} 
-                      className="text-red-400 hover:text-red-600 transition-colors"
-                    >
-                      Видалити
-                    </button>
+                    <form action={deleteArticle}>
+                      <input type="hidden" name="id" value={article.id} />
+                      <button 
+                        type="submit"
+                        className="text-red-400 hover:text-red-600 transition-colors"
+                      >
+                        Видалити
+                      </button>
+                    </form>
                   </div>
 
                 </div>
