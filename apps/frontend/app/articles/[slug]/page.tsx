@@ -159,7 +159,7 @@ export default function ArticlePage() {
       </div>
 
       <div
-        className="max-w-3xl mx-auto px-6 prose prose-lg prose-slate font-medium leading-relaxed mb-16"
+        className="whitespace-pre-wrap max-w-3xl mx-auto px-6 prose prose-lg prose-slate font-medium leading-relaxed mb-16"
         dangerouslySetInnerHTML={{
           __html: article.content || "<p>Текст статті відсутній.</p>",
         }}
