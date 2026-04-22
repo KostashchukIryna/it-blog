@@ -4,17 +4,21 @@ import Link from "next/link";
 export default async function ArticlePage({
   params,
 }: {
-  params: Promise<{ slug: string }> | { slug: string };
+  params: Promise<{ slug: string[] }> | { slug: string[] };
 }) {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+  const slugArray = resolvedParams.slug;
   const API_URL = process.env.BACKEND_URL || "http://localhost:3001";
+
+  const finalSlug = slugArray[slugArray.length - 1];
+  
+  const urlCategory = slugArray.length > 1 ? slugArray[0] : null;
 
   let article: any = null;
   let related: any[] = [];
 
   try {
-    const artRes = await fetch(`${API_URL}/api/articles/${slug}`, { cache: "no-store" });
+    const artRes = await fetch(`${API_URL}/api/articles/${finalSlug}`, { cache: "no-store" });
     
     if (artRes.status === 404) {
       notFound();
@@ -24,7 +28,12 @@ export default async function ArticlePage({
       const artData = await artRes.json();
       article = artData.data || artData;
 
-      // Збільшуємо лічильник переглядів (Fire and forget запит)
+      const realCategorySlug = article.category?.slug;
+      if (urlCategory && realCategorySlug && realCategorySlug !== urlCategory) {
+        console.warn(`Невідповідність URL: очікувалась категорія ${realCategorySlug}, але введено ${urlCategory}`);
+        return notFound();
+      }
+
       if (article?.id) {
         fetch(`${API_URL}/api/articles/${article.id}/view`, {
           method: "POST",
@@ -33,7 +42,7 @@ export default async function ArticlePage({
       }
     }
 
-    const relRes = await fetch(`${API_URL}/api/articles/${slug}/related`, { cache: "no-store" });
+    const relRes = await fetch(`${API_URL}/api/articles/${finalSlug}/related`, { cache: "no-store" });
     if (relRes.ok) {
       const relData = await relRes.json();
       related = relData.data || relData || [];
@@ -49,12 +58,48 @@ export default async function ArticlePage({
     return new Date(dateString).toLocaleDateString("uk-UA");
   };
 
+  const displayCategorySlug = urlCategory || article.category?.slug;
+  const displayCategoryName = article.category?.name || displayCategorySlug;
+
   return (
     <article className="min-h-screen bg-white pb-20">
       <header className="max-w-4xl mx-auto px-6 pt-20 pb-10 text-center">
+        
+        <nav className="mb-10 text-[12px] font-black uppercase tracking-widest text-slate-400">
+          <ol className="flex items-center justify-center space-x-2">
+            <li>
+              <Link href="/" className="hover:text-blue-600 transition-colors">
+                Головна
+              </Link>
+            </li>
+            <li><span className="mx-2 opacity-50">/</span></li>
+            <li>
+              <Link href="/categories" className="hover:text-blue-600 transition-colors">
+                Категорії
+              </Link>
+            </li>
+            <li><span className="mx-2 opacity-50">/</span></li>
+            
+            {displayCategorySlug && (
+              <>
+                <li>
+                  <Link href={`/categories/${displayCategorySlug}`} className="hover:text-blue-600 transition-colors">
+                    {displayCategoryName}
+                  </Link>
+                </li>
+                <li><span className="mx-2 opacity-50">/</span></li>
+              </>
+            )}
+
+            <li className="text-slate-900 truncate max-w-[150px] sm:max-w-[300px]" title={article.title}>
+              {article.title}
+            </li>
+          </ol>
+        </nav>
+
         {article.category?.name && (
           <span className="inline-block px-4 py-1.5 mb-6 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full">
-            {article.category.name || "Без категорії"}
+            {article.category.name}
           </span>
         )}
 
@@ -192,29 +237,34 @@ export default async function ArticlePage({
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {related.map((rel) => (
-                <Link
-                  key={rel.id}
-                  href={`/articles/${rel.slug}`}
-                  className="group block bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all"
-                >
-                  <div className="aspect-[16/9] w-full bg-slate-100 relative">
-                    {rel.cover_url ? (
-                      <img
-                        src={rel.cover_url}
-                        alt={rel.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : null}
-                  </div>
+              {related.map((rel) => {
+                const relCategory = rel.category?.slug || displayCategorySlug;
+                const relHref = relCategory ? `/${relCategory}/${rel.slug}` : `/${rel.slug}`;
 
-                  <div className="p-8">
-                    <h3 className="text-xl font-black text-slate-900 leading-tight mb-3 group-hover:text-blue-600 transition-colors">
-                      {rel.title}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
+                return (
+                  <Link
+                    key={rel.id}
+                    href={relHref}
+                    className="group block bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all"
+                  >
+                    <div className="aspect-[16/9] w-full bg-slate-100 relative">
+                      {rel.cover_url ? (
+                        <img
+                          src={rel.cover_url}
+                          alt={rel.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : null}
+                    </div>
+
+                    <div className="p-8">
+                      <h3 className="text-xl font-black text-slate-900 leading-tight mb-3 group-hover:text-blue-600 transition-colors">
+                        {rel.title}
+                      </h3>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

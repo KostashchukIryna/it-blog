@@ -119,23 +119,31 @@ export default async function AuthorPage({
            </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {visibleArticles.map((article: any) => (
-              <article key={article.id} className="group flex flex-col">
-                <div className="aspect-video bg-slate-100 relative overflow-hidden rounded-3xl mb-6 shadow-sm">
-                  <img 
-                    src={article.cover_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"} 
-                    alt={article.title} 
-                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
-                  />
-                </div>
-                <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
-                  {article.category?.name || "Без категорії"}
-                </span>
-                <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
-                  <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-                </h3>
-              </article>
-            ))}
+            {visibleArticles.map((article: any) => {
+              
+              const articleHref = article.category?.slug 
+                ? `/${article.category.slug}/${article.slug}` 
+                : `/${article.slug}`;
+
+              return (
+                <article key={article.id} className="group flex flex-col">
+                  <div className="aspect-video bg-slate-100 relative overflow-hidden rounded-3xl mb-6 shadow-sm">
+                    <img 
+                      src={article.cover_url || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"} 
+                      alt={article.title} 
+                      className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
+                    />
+                  </div>
+                  <span className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
+                    {article.category?.name || "Без категорії"}
+                  </span>
+                  <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
+                    {/* Використовуємо нове посилання */}
+                    <Link href={articleHref}>{article.title}</Link>
+                  </h3>
+                </article>
+              );
+            })}
           </div>
         )}
 
