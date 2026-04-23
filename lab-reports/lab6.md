@@ -12,6 +12,35 @@
 
 ## 3. Аналіз швидкості
 
+### 3.1 - Baseline вимірювання (до оптимізації)
+
+Для проведення базового вимірювання швидкості завантаження було обрано два пріоритетні шаблони сторінок веб-додатку:
+1. Головна сторінка (список статей).
+2. Сторінка конкретної публікації.
+
+**Результати вимірювання з PageSpeed Insights:**
+
+| URL | Device | Performance | LCP | INP | CLS | TTFB | FCP | Статус CWV |
+|---|---|---|---|---|---|---|---|---|
+| https://it-blog-news.pp.ua/ | Mobile | 100 | 1.5s | N/A | 0 | 10ms | 0.9s | Good |
+| https://it-blog-news.pp.ua/ | Desktop | 95 | 0.8s | N/A | 0 | 120ms | 0.3s | Good |
+| https://it-blog-news.pp.ua/backend/why-clean-code-matters | Mobile | 96 | 2.7s | N/A | 0 | 60ms | 0.9s | Good |
+| https://it-blog-news.pp.ua/backend/why-clean-code-matters | Desktop | 100 | 0.5s | N/A | 0.003 | 0s | 0.3s | Good |
+
+---
+
+#### 3.2 - Аналіз причин
+
+Для кожного URL було проаналізовано розділи **Opportunities**  та **Diagnostics**  у PageSpeed Insights.
+
+| URL | Проблема | Яку метрику псує | Потенційний вплив | Пріоритет |
+|---|---|---|---|---|
+| https://it-blog-news.pp.ua/ | Зменште код JavaScript, який не використовується | INP, TBT | Збільшення часу блокування через важкий процес ініціалізації React на смартфонах. | Medium |
+| https://it-blog-news.pp.ua/ | Уникайте тривалих завдань у головному потоці| TBT | Указано найтриваліші завдання в головному потоці. Ці дані корисні, щоб визначати, що найбільше впливає на затримку вхідного сигналу. | Medium |
+| https://it-blog-news.pp.ua/backend/why-clean-code-matters | Покращте показ зображень | LCP | Зменшення часу завантаження зображень може прискорити візуалізацію сторінки й покращити показник LCP | High |
+| https://it-blog-news.pp.ua/backend/why-clean-code-matters | Застарілі функції JavaScript | LCP | Щоб оптимізувати показник LCP, зробіть зображення LCP видимим у HTML-коді відразу й не використовуйте відкладене завантаження | Medium |
+
+
 ---
 
 ## 4. Отримізація Core Web Vitals
