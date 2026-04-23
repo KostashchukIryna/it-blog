@@ -52,22 +52,22 @@ services:
     # Спочатку запускаємо сідер, а потім основний додаток
     command: sh -c "node src/seed.js && node src/index.js"
 
-  frontend:
-    build:
-      context: ./apps/frontend
-      args:
-        # Ця змінна потрібна на етапі збірки для next.config.ts
-        - BACKEND_URL=http://backend:3001
-    container_name: it_blog_frontend
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      backend:
-        condition: service_healthy
-    environment:
-      - BACKEND_URL=http://backend:3001
-      - NODE_ENV=production
+  # frontend:
+  #   build:
+  #     context: ./apps/frontend
+  #     args:
+  #       # Ця змінна потрібна на етапі збірки для next.config.ts
+  #       - BACKEND_URL=http://backend:3001
+  #   container_name: it_blog_frontend
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy
+  #   environment:
+  #     - BACKEND_URL=http://backend:3001
+  #     - NODE_ENV=production
 
 volumes:
   postgres_data:
