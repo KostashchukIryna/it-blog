@@ -26,9 +26,11 @@ export default async function CategoriesIndexPage() {
 
   if (fetchError || categories.length === 0) {
     categories = [
-      { id: 1, name: "Backend", slug: "backend", description: "Тимчасова мок-категорія (бекенд не працює)" },
-      { id: 2, name: "Frontend", slug: "frontend", description: "Можете тестувати верстку тут" },
-      { id: 3, name: "Architecture", slug: "architecture", description: "Хлібні крихти і посилання працюватимуть" }
+      { id: 1, name: "Backend", slug: "backend", description: "Все про бекенд" },
+      { id: 2, name: "Frontend", slug: "frontend", description: "Все про верстку тут" },
+      { id: 3, name: "Architecture", slug: "architecture", description: "Все про архітектуру" },
+      { id: 4, name: "JavaScript", slug: "javascript", description: "JS фреймворки і більше" },
+      { id: 5, name: "Штучний Інтелект", slug: "ai", description: "Новини зі світу ШІ" }
     ];
   }
 
