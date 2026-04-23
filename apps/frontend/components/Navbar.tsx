@@ -5,14 +5,27 @@ import { apiFetch } from "@/lib/api";
 
 export default async function Navbar() {
   let categories = [];
+  let fetchError = false;
+
   try {
     const res = await apiFetch("/api/categories", { cache: "no-store" });
     if (res.ok) {
       const result = await res.json();
       categories = result.data || result || [];
+    } else {
+      fetchError = true;
     }
   } catch (error) {
-    console.error(error);
+    console.error("Navbar fetch error:", error);
+    fetchError = true;
+  }
+
+  if (fetchError || categories.length === 0) {
+    categories = [
+      { name: "Backend", slug: "backend" },
+      { name: "Frontend", slug: "frontend" },
+      { name: "Architecture", slug: "architecture" },
+    ];
   }
 
   return (
@@ -25,6 +38,7 @@ export default async function Navbar() {
           BLOG.IT
         </Link>
 
+        {/* МЕНЮ КАТЕГОРІЙ */}
         <div className="hidden md:flex space-x-8 items-center">
           {categories.map((item: any) => (
             <Link
@@ -36,7 +50,8 @@ export default async function Navbar() {
             </Link>
           ))}
 
-          {categories.length > 0 && <span className="text-slate-200">|</span>}
+          <span className="text-slate-200">|</span>
+          
           <Link
             href="/about"
             className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-colors"
