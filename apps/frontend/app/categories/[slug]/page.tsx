@@ -13,8 +13,9 @@ export default async function CategoryPage({
   const limit = parseInt(resolvedSearchParams?.limit || '12', 10);
   const API_URL = process.env.BACKEND_URL || 'http://localhost:3001';
 
-  let articles = [];
+  let articles: any[] = [];
   let categoryInfo = null;
+  let fetchError = false;
 
   try {
     const [catRes, articlesRes] = await Promise.all([
@@ -25,18 +26,70 @@ export default async function CategoryPage({
     if (catRes.ok) {
       const catResult = await catRes.json();
       categoryInfo = catResult.data || catResult || null;
+    } else {
+      fetchError = true;
     }
 
     if (articlesRes.ok) {
       const articlesResult = await articlesRes.json();
       articles = articlesResult.data || articlesResult.rows || [];
+    } else {
+      fetchError = true;
     }
   } catch (error) {
     console.error("Помилка завантаження категорії:", error);
+    fetchError = true;
+  }
+
+  if (fetchError || articles.length === 0) {
+    articles = [
+      {
+        id: 'mock-1',
+        slug: 'why-clean-code-matters',
+        title: 'Why Clean Code Matters (And How to Write It)',
+        excerpt: 'Code is read more often than it is written. Learn the principles of writing clean, readable, and maintainable code.',
+        cover_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80',
+      },
+      {
+        id: 'mock-2',
+        slug: 'mastering-typescript-generics',
+        title: 'Mastering TypeScript Generics',
+        excerpt: 'Unlock the full power of TypeScript by understanding generics. Create reusable, type-safe components easily.',
+        cover_url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80',
+      },
+      {
+        id: 'mock-3',
+        slug: 'core-web-vitals',
+        title: 'Core Web Vitals: A Practical Guide to Web Performance',
+        excerpt: 'Improve your user experience and SEO rankings by focusing on Google\'s Core Web Vitals: LCP, FID, and CLS.',
+        cover_url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80',
+      },
+      {
+        id: 'mock-4',
+        slug: 'css-grid-vs-flexbox',
+        title: 'CSS Grid vs. Flexbox: Which One Should You Use?',
+        excerpt: 'They are both powerful layout tools, but they solve different problems. A deep dive into modern CSS layouts.',
+        cover_url: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=600&q=80',
+      },
+      {
+        id: 'mock-5',
+        slug: 'building-rest-api-nestjs',
+        title: 'Building a Production-Ready REST API with NestJS',
+        excerpt: 'Leverage the power of TypeScript and a modular architecture to build scalable backend services.',
+        cover_url: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80',
+      },
+      {
+        id: 'mock-6',
+        slug: 'deep-dive-react-hooks',
+        title: 'A Deep Dive into React Hooks',
+        excerpt: 'Go beyond useState and useEffect. Explore advanced hooks like useReducer, useCallback, and useMemo.',
+        cover_url: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&q=80',
+      }
+    ];
   }
 
   const info = categoryInfo || {
-    name: slug, 
+    name: fetchError ? `${slug}` : slug, 
     description: 'Перегляд публікацій за обраною категорією.' 
   };
 
@@ -72,7 +125,7 @@ export default async function CategoryPage({
             {info.name}
           </h1>
           <p className="text-slate-500 text-xl max-w-2xl leading-relaxed">
-            {info.description || 'Перегляд публікацій за обраною категорією.'}
+            {info.description}
           </p>
         </header>
 

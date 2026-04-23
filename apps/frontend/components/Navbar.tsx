@@ -25,6 +25,8 @@ export default async function Navbar() {
       { name: "Backend", slug: "backend" },
       { name: "Frontend", slug: "frontend" },
       { name: "Architecture", slug: "architecture" },
+      { name: "JavaScript", slug: "javascript" },
+      { name: "Штучний Інтелект", slug: "ai" }
     ];
   }
 
