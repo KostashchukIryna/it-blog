@@ -98,4 +98,4 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { list, articlesByCategory, adminList, create, update, remove };
+module.exports = { list, articlesByCategory, getByPath, adminList, create, update, remove };

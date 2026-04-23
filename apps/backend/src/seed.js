@@ -78,7 +78,9 @@ const TECH_IMAGES = [
     for (const [name, slug, description] of categories) {
       const { rows } = await db.query(
         `INSERT INTO categories (name, slug, description)
-         VALUES ($1,$2,$3) ON CONFLICT (slug) DO UPDATE SET name=EXCLUDED.name, description=EXCLUDED.description
+         VALUES ($1,$2,$3)
+         ON CONFLICT (slug) WHERE parent_id IS NULL
+         DO UPDATE SET name=EXCLUDED.name, description=EXCLUDED.description
          RETURNING id, slug`,
         [name, slug, description]
       );
