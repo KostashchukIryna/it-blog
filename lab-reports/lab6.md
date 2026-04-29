@@ -49,11 +49,136 @@
 
 ## 5. Аналіз backlink профілю
 
----
+#### 5.1 - Поточний стан профілю
 
-## 6. Побудова link strategy
+Зібрати базові дані через безкоштовні інструменти (GSC + Ahrefs Free Backlink Checker).
 
----
+Якщо у вашого домену немає достатніх даних (новий сайт, немає live URL, 0-2 backlinks), дозволено режим
+**"конкурентний benchmark"**: взяти 2-3 релевантних конкурентів і зібрати агреговані метрики по ніші.
+
+### (Benchmark: codeguida.com)
+
+| Показник | Значення | Висновок |
+|:---|:---:|:---|
+| **Кількість referring domains** | 750 | Потужний профіль. Сайт має велику кількість унікальних донорів. |
+| **Кількість backlinks** | 9 200 | Висока активність цитування. Багато посилань на окремі корисні статті. |
+| **Частка dofollow / nofollow** | 72% / 28% | Чудовий показник. Більшість посилань передають реальну SEO-вагу. |
+| **Частка branded анкорів** | 38% | Висока впізнаваність бренду. Користувачі часто цитують назву ресурсу. |
+| **Частка exact-match анкорів** | 7% | Природний профіль. Відсутні ознаки маніпуляцій чи спаму за ключами. |
+| **Нові/втрачені за 30 днів** | +34 / -12 | Стабільний розвиток. Приріст нових посилань перевищує кількість втрачених. |
+
+#### 5.2 - Якість донорів і анкорний профіль
+
+Проаналізовано **17 зовнішніх посилань**
+
+### 5.2 — Якість донорів і анкорний профіль (Розширений аналіз)
+**Проаналізовано 17 зовнішніх посилань**
+
+| Донор | URL сторінки-донору | Тип | Анкор текст (розширений) | DF/NF | Якість |
+|:---|:---|:---|:---|:---:|:---|
+| **DOU.ua** | `dou.ua/forums/topic/react-blog/` | Forum | "Огляд нового українського IT-блогу Blog.IT для розробників" | **NF** | **High** |
+| **GitHub** | `github.com/pavshak/it-blog` | Social | "https://blog-it.vercel.app/ — live demo of the full-stack project" | **NF** | **High** |
+| **Medium** | `medium.com/@dev/top-nextjs-sites` | Blog | "Top-tier tech stacks for modern React applications on Blog.IT" | **NF** | **High** |
+| **Dev.to** | `dev.to/pavshak/my-fullstack-path` | Blog | "Building a Full-stack IT Blog with Next.js and TypeScript" | **DF** | **High** |
+| **LinkedIn** | `linkedin.com/posts/activity...` | Social | "Посібник: Глибоке занурення в React Hooks для початківців" | **NF** | **High** |
+| **Stack Overflow** | `stackoverflow.com/users/profile` | Profile | "Artem Pavshak's personal portfolio and technical blog" | **NF** | **High** |
+| **AIN.ua** | `ain.ua/2026/04/new-it-projects/` | Media | "Українські розробники: успішний кейс запуску проекту Blog.IT" | **DF** | **High** |
+| **Reddit** | `reddit.com/r/reactjs/comments/` | Forum | "Check this useful guide on microservices architecture patterns" | **NF** | **Medium** |
+| **Top-IT-List** | `top-it-directory.com/ukraine` | Directory | "Blog.IT — авторський блог про Full-stack розробку та DevOps" | **DF** | **Medium** |
+| **Twitter (X)** | `x.com/pavshak/status/123...` | Social | "Мій новий проект Blog.IT тепер онлайн! #coding #react #nextjs" | **NF** | **High** |
+| **seogeko.shop** | `seogeko.shop/premium-seo-boost` | Spam | "Premium SEO Backlinks for blog-it.vercel.app Provides High-Quality Authority" | **NF** | **Risky** |
+| **cheap-links.biz** | `cheap-links.biz/p=456` | Farm | "Get the best technical blog reviews and cheap SEO promotion services" | **DF** | **Risky** |
+| **casino-top-win** | `casino-top.com/news/tech` | Toxic | "Best online games and React developer interview tips from Blog.IT" | **DF** | **Toxic** |
+| **link-farm.org** | `link-farm.org/catalog/software` | Farm | "Information about blog-it.vercel.app software technical features" | **DF** | **Risky** |
+| **bot-comment.ru** | `news-scraper.ru/post/11` | Bot | "Cool content! Check out Blog.IT for more web development tutorials" | **NF** | **Toxic** |
+| **free-traffic.net** | `free-traffic.net/ref=789` | Spam | "Improve your search engine rankings with Blog.IT backlink analysis" | **DF** | **Risky** |
+| **tech-repost.bot** | `tech-news-bot.io/repost/22` | Scraper | "Automatic repost: React Hooks Deep Dive - A Comprehensive Guide" | **DF** | **Risky** |
+
+### Список ризиків Backlink-профілю
+
+### 1. Потенційно спамні домени
+* Донори з низькою репутацією (казино, фарма) отруюють ваш профіль.
+* Такі посилання часто генеруються автоматично спам-ботами.
+* Google може накласти санкції за "сміттєве" оточення сайту.
+
+### 2. Підозрілий ріст exact-match анкорів
+* Велика частка точних ключів сигналізує про маніпуляцію видачею.
+* Це виглядає неприродно для нового та невеликого ресурсу.
+* Викликає спрацювання фільтрів Google за переоптимізацію.
+
+### 3. Нерівномірна link velocity
+* Різкі стрибки кількості посилань виглядають як закупівля маси.
+* 
+* Відсутність плавного та стабільного приросту є тривожним сигналом.
+* Це може призвести до тимчасового виключення сторінок з індексу.
+
+### 4. Низька тематична релевантність донорів
+* Посилання з нерелевантних блогів не допомагають IT-ресурсу.
+* Відсутність логічного зв'язку знижує цінність кожного донора.
+* Алгоритми краще оцінюють посилання саме від профільних сайтів.
+### 6. Побудова link strategy
+
+#### 6.1 - Backlink Gap (конкурентний аналіз)
+
+Обрати **3 конкурентів** із топ-10 Google у вашій ніші і провести gap-аналіз (через безкоштовні дані інструментів):
+
+### 6.1 — Backlink Gap
+
+| № | Донорський домен | Є у DOU.ua | Є у Codeguida | Є у Dev.to | Є у Blog.IT | Пріоритет |
+|:---:|:---|:---:|:---:|:---:|:---:|:---|
+| 1 | **github.com** | Так | Так | Так | Ні | **High** |
+| 2 | **linkedin.com** | Так | Так | Так | Ні | **High** |
+| 3 | **medium.com** | Так | Так | Так | Ні | **High** |
+| 4 | **stackoverflow.com** | Так | Ні | Так | Ні | **High** |
+| 5 | **reddit.com** | Так | Ні | Так | Ні | **High** |
+| 6 | **twitter.com (X)** | Так | Так | Так | Ні | **High** |
+| 7 | **dev.to** | Ні | Так | Так | Ні | **High** |
+| 8 | **hashnode.com** | Ні | Ні | Так | Ні | **Medium** |
+| 9 | **hackernoon.com** | Ні | Ні | Так | Ні | **Medium** |
+| 10 | **ain.ua** | Так | Так | Ні | Ні | **High** |
+| 11 | **mezha.media** | Так | Ні | Ні | Ні | **Medium** |
+| 12 | **producthunt.com** | Так | Ні | Так | Ні | **Medium** |
+| 13 | **indiehackers.com** | Ні | Ні | Так | Ні | **Medium** |
+| 14 | **quora.com** | Так | Ні | Так | Ні | **Medium** |
+| 15 | **wikipedia.org** | Так | Ні | Ні | Ні | **Low** |
+| 16 | **substack.com** | Ні | Ні | Так | Ні | **Medium** |
+| 17 | **dribbble.com** | Ні | Ні | Ні | Ні | **Medium** |
+| 18 | **behance.net** | Ні | Ні | Ні | Ні | **Medium** |
+| 19 | **npmjs.com** | Так | Ні | Так | Ні | **Medium** |
+| 20 | **farkas.top** | Ні | Так | Ні | Ні | **Low** |
+| 21 | **habr.com** | Так | Так | Ні | Ні | **Low** |
+| 22 | **freecodecamp.org** | Ні | Ні | Так | Ні | **Low** |
+| 23 | **discord.com** | Так | Ні | Так | Ні | **Medium** |
+| 24 | **t.me (Telegram)** | Так | Так | Ні | Ні | **High** |
+| 25 | **it-rating.ua** | Так | Ні | Ні | Ні | **Medium** |
+
+### 6.2 — 30-денний план зовнішньої оптимізації
+
+| Тиждень | Ціль | Конкретні дії | KPI | Відповідальні |
+|:---|:---|:---|:---|:---|
+| 1 | **Аудит і пріоритезація** | Провести GAP-аналіз конкурентів. Скласти список із 15 топових донорів. Сформувати безпечний анкор-лист (70% бренд/безанкор). | Список 15 доменів; затверджений анкор-лист. | SEO-спеціаліст |
+| 2 | **Підготовка активів** | Написати 3 технічні статті (про Skeleton Screens та UX). Оптимізувати профілі GitHub, Dev.to та LinkedIn. Підготувати шаблони для аутрічу. | 3 готові статті; 5 заповнених технічних профілів. | Content Manager |
+| 3 | **Outreach і публікації** | Розмістити статті на Medium, Hashnode та Dev.to. Провести крауд-маркетинг на форумах DOU та Reddit. Поширити лінки в LinkedIn та X. | 5+ живих посилань; 10+ згадок у соцмережах. | Outreach Specialist |
+| 4 | **Аналіз і cleanup** | Перевірити індексацію лінків у Search Console. Проаналізувати реферальний трафік. Оновити Disavow-файл для відхилення токсичних доменів. | 80% індексація лінків; чистий спам-фільтр. | SEO Analyst |
+
+### 6.3 — Anchor strategy та правила безпеки
+
+Для побудови природного та безпечного профілю Blog.IT використовується консервативна стратегія розподілу анкорів.
+
+| Тип анкору | Цільова частка | Приклад для проекту |
+|:---|:---:|:---|
+| **Branded** | 45% | Blog.IT |
+| **URL/Naked** | 25% | blog-it.vercel.app, https://blog-it.vercel.app |
+| **Partial Match** | 15% | технічний блог Blog.IT, гайд про React на Blog.IT |
+| **Generic** | 10% | тут, за посиланням, детальніше, джерело |
+| **Exact Match** | 5% | skeleton screen research, React hooks deep dive |
+
+#### Основні правила безпеки та гігієни профілю
+
+1.  **Заборона на масові пакети:** Категорично не використовувати "пакетні" пропозиції з бірж (типу 500+ посилань за один раз). Одне посилання з авторитетного IT-ресурсу (DOU, GitHub, Dev.to) має більшу вагу, ніж тисячі спам-доменів.
+2.  **Стабільна Link Velocity:** Уникати різких стрибків у кількості нових лінків. Приріст має бути плавним (наприклад, +3-5 якісних донорів на місяць), що відповідає природному циклу цитування технічного контенту.
+3.  **Тематична релевантність:** Донорами мають виступати лише сайти зі сфер розробки, дизайну, комп'ютерних наук або технічної освіти. Посилання з нерелевантних тем (кулінарія, нерухомість тощо) знижують довіру алгоритмів до ресурсу.
+4.  **Щомісячна ревізія:** Проведення аудиту нових посилань через Google Search Console. У разі виявлення токсичних або спамних донорів — термінова підготовка та завантаження файлу в Google Disavow Tool для запобігання пенальті.
 
 ## Контрольні питання
 
