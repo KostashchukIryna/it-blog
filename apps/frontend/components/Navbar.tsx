@@ -7,16 +7,15 @@ export default async function Navbar() {
   let categories = [];
 
   try {
-    // Отримуємо категорії безпосередньо з вашого API
-    const res = await apiFetch("/api/categories", { cache: "no-store" });
+    const res = await apiFetch("/api/categories", { 
+      next: { revalidate: 3600 }
+     });
 
     if (res.ok) {
       const result = await res.json();
-      // Використовуємо отримані дані або порожній масив, якщо даних немає
       categories = result.data || result || [];
     }
   } catch (error) {
-    // У разі помилки з'єднання в консоль виводиться лог, а меню залишиться порожнім
     console.error("Navbar fetch error:", error);
   }
 
@@ -30,7 +29,6 @@ export default async function Navbar() {
           BLOG.IT
         </Link>
 
-        {/* ДИНАМІЧНЕ МЕНЮ КАТЕГОРІЙ З БД */}
         <div className="hidden md:flex space-x-8 items-center">
           {categories.map((item: any) => (
             <Link
@@ -42,7 +40,6 @@ export default async function Navbar() {
             </Link>
           ))}
 
-          {/* Відображати роздільник, тільки якщо є категорії */}
           {categories.length > 0 && <span className="text-slate-200">|</span>}
           
           <Link
