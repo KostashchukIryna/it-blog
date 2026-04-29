@@ -128,7 +128,7 @@ export default async function HomePage({
 
   let articles: any[] = [];
   let categories = ["Всі"];
-  let fetchError = false; // Прапорець для відстеження помилок сервера
+  let fetchError = false;
 
   try {
     const [artRes, catRes] = await Promise.all([
@@ -144,14 +144,14 @@ export default async function HomePage({
       const realCategories = catResult.data || catResult || [];
       categories = ["Всі", ...realCategories.map((c: any) => c.name)];
     } else {
-      fetchError = true; // Бекенд повернув 500 або іншу помилку
+      fetchError = true;
     }
   } catch (error) {
     console.error("Помилка завантаження даних:", error);
-    fetchError = true; // Бекенд взагалі не відповідає
+    fetchError = true;
   }
 
-  // --- ЗАГЛУШКИ (MOCK DATA) ---
+  // --- MOCK DATA ---
   if (fetchError || articles.length === 0) {
     const mockCategories = [
       { id: 1, name: "Backend", slug: "backend" },
@@ -163,7 +163,6 @@ export default async function HomePage({
 
     categories = ["Всі", ...mockCategories.map((c) => c.name)];
 
-    // Статті з прив'язкою до категорій, щоб фільтр працював
     articles = [
       {
         id: 'mock-1',
@@ -171,7 +170,7 @@ export default async function HomePage({
         title: 'Why Clean Code Matters (And How to Write It)',
         excerpt: 'Code is read more often than it is written. Learn the principles of writing clean, readable, and maintainable code.',
         cover_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80',
-        category: mockCategories[0] // Backend
+        category: mockCategories[0]
       },
       {
         id: 'mock-2',
@@ -179,7 +178,7 @@ export default async function HomePage({
         title: 'Mastering TypeScript Generics',
         excerpt: 'Unlock the full power of TypeScript by understanding generics. Create reusable, type-safe components easily.',
         cover_url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80',
-        category: mockCategories[1] // Frontend
+        category: mockCategories[1]
       },
       {
         id: 'mock-3',
@@ -187,7 +186,7 @@ export default async function HomePage({
         title: 'Core Web Vitals: A Practical Guide to Web Performance',
         excerpt: 'Improve your user experience and SEO rankings by focusing on Google\'s Core Web Vitals: LCP, FID, and CLS.',
         cover_url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80',
-        category: mockCategories[1] // Frontend
+        category: mockCategories[1]
       },
       {
         id: 'mock-4',
@@ -195,7 +194,7 @@ export default async function HomePage({
         title: 'CSS Grid vs. Flexbox: Which One Should You Use?',
         excerpt: 'They are both powerful layout tools, but they solve different problems. A deep dive into modern CSS layouts.',
         cover_url: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=600&q=80',
-        category: mockCategories[1] // Frontend
+        category: mockCategories[1]
       },
       {
         id: 'mock-5',
@@ -203,7 +202,7 @@ export default async function HomePage({
         title: 'Building a Production-Ready REST API with NestJS',
         excerpt: 'Leverage the power of TypeScript and a modular architecture to build scalable backend services.',
         cover_url: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80',
-        category: mockCategories[0] // Backend
+        category: mockCategories[0]
       },
       {
         id: 'mock-6',
@@ -211,12 +210,11 @@ export default async function HomePage({
         title: 'A Deep Dive into React Hooks',
         excerpt: 'Go beyond useState and useEffect. Explore advanced hooks like useReducer, useCallback, and useMemo.',
         cover_url: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&q=80',
-        category: mockCategories[3] // JavaScript
+        category: mockCategories[3]
       }
     ];
   }
 
-  // Логіка фільтрації
   const filteredArticles = articles.filter((article: any) => {
     if (activeCategory === "Всі") return true;
     return article.category?.name === activeCategory;
@@ -231,13 +229,6 @@ export default async function HomePage({
           <h1 className="text-6xl font-black text-slate-900 mb-4 tracking-tighter">
             Останні публікації
           </h1>
-
-          {/* Індикатор помилки для розробника
-          {fetchError && (
-            <div className="mb-6 inline-block px-4 py-2 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg border border-amber-200">
-              ⚠️ Бекенд недоступний. Відображаються тестові дані.
-            </div>
-          )} */}
 
           <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((cat) => (
