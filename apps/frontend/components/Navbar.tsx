@@ -5,29 +5,19 @@ import { apiFetch } from "@/lib/api";
 
 export default async function Navbar() {
   let categories = [];
-  let fetchError = false;
 
   try {
+    // Отримуємо категорії безпосередньо з вашого API
     const res = await apiFetch("/api/categories", { cache: "no-store" });
+
     if (res.ok) {
       const result = await res.json();
+      // Використовуємо отримані дані або порожній масив, якщо даних немає
       categories = result.data || result || [];
-    } else {
-      fetchError = true;
     }
   } catch (error) {
+    // У разі помилки з'єднання в консоль виводиться лог, а меню залишиться порожнім
     console.error("Navbar fetch error:", error);
-    fetchError = true;
-  }
-
-  if (fetchError || categories.length === 0) {
-    categories = [
-      { name: "Backend", slug: "backend" },
-      { name: "Frontend", slug: "frontend" },
-      { name: "Architecture", slug: "architecture" },
-      { name: "JavaScript", slug: "javascript" },
-      { name: "Штучний Інтелект", slug: "ai" }
-    ];
   }
 
   return (
@@ -40,7 +30,7 @@ export default async function Navbar() {
           BLOG.IT
         </Link>
 
-        {/* МЕНЮ КАТЕГОРІЙ */}
+        {/* ДИНАМІЧНЕ МЕНЮ КАТЕГОРІЙ З БД */}
         <div className="hidden md:flex space-x-8 items-center">
           {categories.map((item: any) => (
             <Link
@@ -52,7 +42,8 @@ export default async function Navbar() {
             </Link>
           ))}
 
-          <span className="text-slate-200">|</span>
+          {/* Відображати роздільник, тільки якщо є категорії */}
+          {categories.length > 0 && <span className="text-slate-200">|</span>}
           
           <Link
             href="/about"
