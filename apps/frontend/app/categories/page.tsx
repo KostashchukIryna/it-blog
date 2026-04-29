@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 export default async function CategoriesIndexPage() {
-  // Надійна адреса бекенду для Docker
   const API_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   
   let categories = [];
