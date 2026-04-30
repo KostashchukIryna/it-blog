@@ -15,6 +15,7 @@ const raleway = Raleway({
 export const metadata: Metadata = {
   title: "Blog.IT - Новини технологій",
   description: "Найактуальніші новини з технологічного світу",
+  robots: "index, follow",
   verification: {
     google: "15sVple1_vw-CvARaogsP6UgaB5wj3iNoWnLQ4Hex30",
   },

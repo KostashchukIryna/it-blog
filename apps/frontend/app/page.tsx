@@ -1,5 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog.IT - Новини технологій",
+  description: "Найактуальніші новини з технологічного світу",
+  alternates: {
+    canonical: "https://it-blog-news.pp.ua",
+  },
+  openGraph: {
+    title: "Blog.IT - Новини технологій",
+    description: "Найактуальніші новини з технологічного світу",
+    type: "website",
+    url: "https://it-blog-news.pp.ua",
+  },
+};
 
 export default async function HomePage({
   searchParams,
@@ -43,9 +58,31 @@ export default async function HomePage({
 
   const visibleArticles = filteredArticles.slice(0, limit);
 
+  // JSON-LD Schema for Organization/Website
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Blog.IT",
+    url: "https://it-blog-news.pp.ua",
+    description: "Найактуальніші новини з технологічного світу",
+    publisher: {
+      "@type": "Organization",
+      name: "Blog.IT",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://it-blog-news.pp.ua/logo.png",
+      },
+    },
+  };
+
   return (
-    <div className="bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <div className="bg-white min-h-screen">
+        <div className="max-w-7xl mx-auto px-6 py-16">
         <header className="mb-16">
           <h1 className="text-7xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.9]">
             Професійний блог <br />
@@ -149,6 +186,7 @@ export default async function HomePage({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

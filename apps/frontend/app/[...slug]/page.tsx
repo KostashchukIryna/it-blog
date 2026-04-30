@@ -1,6 +1,58 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string[] }> | { slug: string[] };
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slugArray = resolvedParams.slug;
+  const API_URL = process.env.BACKEND_URL || "http://localhost:3001";
+  const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || "https://it-blog-news.pp.ua";
+
+  if (slugArray.length !== 2) {
+    return { title: "Not Found" };
+  }
+
+  const finalSlug = decodeURIComponent(slugArray[1]).toLowerCase();
+
+  try {
+    const artRes = await fetch(`${API_URL}/api/articles/${finalSlug}`, {
+      cache: "no-store",
+    });
+
+    if (artRes.ok) {
+      const artData = await artRes.json();
+      const article = artData.data || artData;
+
+      if (article) {
+        const canonicalUrl = `${DOMAIN}/${article.category?.slug || slugArray[0]}/${article.slug}`;
+        return {
+          title: article.title,
+          description: article.excerpt || article.title,
+          alternates: {
+            canonical: canonicalUrl,
+          },
+          authors: article.author ? [{ name: article.author.name }] : [],
+          openGraph: {
+            title: article.title,
+            description: article.excerpt || article.title,
+            type: "article",
+            url: canonicalUrl,
+            images: article.cover_url ? [{ url: article.cover_url }] : [],
+          },
+        };
+      }
+    }
+  } catch (error) {
+    console.error("Помилка отримання метаданих:", error);
+  }
+
+  return { title: "Article" };
+}
 
 export default async function ArticlePage({
   params,
@@ -84,8 +136,42 @@ export default async function ArticlePage({
     return new Date(dateString).toLocaleDateString("uk-UA");
   };
 
+  // JSON-LD Schema for Article
+  const canonicalUrl = `https://it-blog-news.pp.ua/${realCategorySlug}/${finalSlug}`;
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.excerpt || article.title,
+    image: article.cover_url || "https://it-blog-news.pp.ua/og-image.jpg",
+    datePublished: article.published_at || article.created_at,
+    dateModified: article.updated_at || article.published_at || article.created_at,
+    author: {
+      "@type": "Person",
+      name: article.author?.name || "Blog.IT",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Blog.IT",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://it-blog-news.pp.ua/logo.png",
+      },
+    },
+    url: canonicalUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonicalUrl,
+    },
+  };
+
   return (
-    <article className="min-h-screen bg-white pb-20">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <article className="min-h-screen bg-white pb-20">
       <header className="max-w-4xl mx-auto px-6 pt-20 pb-10 text-center">
         <nav className="mb-10 text-[12px] font-black uppercase tracking-widest text-slate-400">
           <ol className="flex items-center justify-center space-x-2">
@@ -217,6 +303,7 @@ export default async function ArticlePage({
           </div>
         </div>
       )}
-    </article>
+      </article>
+    </>
   );
 }
