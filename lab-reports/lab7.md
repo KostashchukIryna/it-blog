@@ -61,51 +61,38 @@
 
 ---
 
-## 3. Налаштування GA4
 
-### 3.1 Базова структура вимірювання
+
+### 3. Налаштування GA4
+
+#### 3.1 - Базова структура вимірювання
+
+Таблиця контролю:
+
 | Налаштування | Статус | Доказ | Коментар |
 |--------------|--------|-------|----------|
-| GA4 property + web data stream | OK | [Скриншот] | Data stream `web` активний |
-| Зв'язка з GSC | OK/Ні | [Скриншот] | ... |
-| Фільтрація внутрішнього трафіку | OK | [Скриншот] | ... |
-| Єдині UTM-правила | OK | [Скриншот] | ... |
+| GA4 property створено та збір даних активний | OK | ![alt text](image-8.png) | Data stream  активний |
+| Фільтрація внутрішнього трафіку | ОК |![alt text](image-9.png) | Активний |
+| Єдині UTM-правила для test campaign | ОК |![alt text](image-10.png) | Налаштовано |
 
-### 3.2 Події для SEO-оцінки (Мінімум 6)
-*(Додайте скриншоти з GTM / DebugView нижче таблиці)*
+#### 3.2 - Події для SEO-оцінки (через GTM або код)
 
 | Event name | Trigger | Parameters | Бізнес/SEO сенс | Перевірка в DebugView |
 |------------|---------|------------|------------------|-----------------------|
-| scroll_75 | Скрол 75% | page_path | Match intent | OK |
-| view_search_results | Внутрішній пошук | search_term | Розуміння потреб | OK |
-| click_cta_primary | Клік головної кнопки | cta_label | Рух по воронці | OK |
-| form_start / generate_lead | Початок форми | form_id | Залученість | OK |
-| form_submit / purchase | Відправка форми | form_id | Фінальна конверсія | OK |
-| click_related_article | Клік на іншу статтю | article_url | Покращення dwell time | OK |
+| `click_cta_primary` | Клік по головній кнопці hero-секції | `page_type`, `intent_type`, `cta_label` | Чи переходить органічний трафік до цільової дії після першого екрану | Event відображається з усіма параметрами |
+| `scroll_75` | Користувач доскролив до 75% висоти сторінки | `page_type`, `page_path`, `content_category` | Індикатор якісного читання — сигнал для Google про корисність сторінки | Event відображається з параметром `page_path` |
+| `view_search_results` | Відображення сторінки результатів внутрішнього пошуку | `search_query`, `results_count`, `search_source` | Чи задовольняє контент інформаційний намір користувача | Event з параметром `search_query` видно в DebugView |
+| `form_start` | Фокус на першому полі підписки / лід-форми | `form_id`, `form_placement`, `page_type` | Міряє намір підписатися ще до відправки — допомагає знайти friction | Event видно одразу після кліку в поле |
+| `generate_lead` | Успішна відправка лід-форми або підписки | `form_id`, `lead_type`, `page_path` | Основна мікроконверсія для контентного сайту | Event з `lead_type` видно в DebugView |
+| `click_related_article` | Клік на рекомендовану / пов'язану статтю | `source_slug`, `target_slug`, `block_position` | Глибина сесії та внутрішня перелінковка — вплив на crawlability і dwell time | Event з обома slug-параметрами видно в DebugView |
 
-**Докази спрацювання (Скриншоти DebugView):**
-* [Вставити скриншот 1]
-* [Вставити скриншот 2]
+#### 3.3 - Налаштування conversions і аудиторій
 
-### 3.3 Налаштування conversions і аудиторій
-**Ключові Conversion Events (мін. 2):**
-1. [Наприклад: `form_submit`]
-2. [Наприклад: `generate_lead`]
-
-**Аудиторії (мін. 3):**
-1. Organic Engaged Users
-2. Organic Non-Engaged
-3. Organic Returning Users
-
-**Скриншоти створених конверсій та аудиторій:**
-* [Вставити скриншот конверсій]
-* [Вставити скриншот аудиторій]
-
-### 3.4 Щотижневий GA4 SEO report
-| KPI | Поточне значення | Минулого тижня | Delta | Порог тривоги | Дія |
-|-----|------------------|----------------|-------|---------------|-----|
-| Organic sessions | 2380 | 2210 | +7.7% | -10% WoW | Продовжити тест CTA |
-| [Інші KPI...] |
+| Тип | Назва | Умова | Навіщо |
+|-----|-------|-------|--------|
+| Conversion | `form_submit` | `event_name = form_submit` | Оцінка внеску SEO у ліди (хто залишив контакти) |
+| Conversion | `click_cta_primary` | `event_name = click_cta_primary` | Відстеження готовності до покупки з органіки |
+| Audience | Organic Engaged | `Medium = organic` + `Engaged session` | Аналіз ядра цільової аудиторії з пошуку |
 
 ---
 
