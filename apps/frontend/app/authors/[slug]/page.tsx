@@ -47,7 +47,6 @@ export default async function AuthorPage({
     getArticlesData(slug),
   ]);
 
-  // Якщо автора немає в БД — видаємо 404 
   if (!author) return notFound();
 
   const visibleArticles = articles.slice(0, limit);

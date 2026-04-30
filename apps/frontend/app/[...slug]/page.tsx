@@ -134,7 +134,7 @@ export default async function ArticlePage({
 
         <div className="flex items-center justify-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
           <Link
-            href="/authors"
+            href={`/authors/${article.author?.slug}`}
             className="hover:text-blue-600 transition-colors underline"
           >
             {article.author?.name || "Редакція"}
