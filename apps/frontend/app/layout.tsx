@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { GoogleAnalytics } from '@next/third-parties/google'
+
 
 const raleway = Raleway({
   subsets: ["latin", "cyrillic"],
@@ -31,6 +33,7 @@ export default function RootLayout({
         <footer className="p-4 border-t text-center text-xs text-gray-400">
           Blog.IT - 2026
         </footer>
+        <GoogleAnalytics gaId="G-MTVG42Q514" /> 
       </body>
     </html>
   );
