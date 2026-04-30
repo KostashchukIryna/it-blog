@@ -133,7 +133,12 @@ export default async function ArticlePage({
         </p>
 
         <div className="flex items-center justify-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-          <span>{article.author?.name || "Редакція"}</span>
+          <Link
+            href="/authors"
+            className="hover:text-blue-600 transition-colors underline"
+          >
+            {article.author?.name || "Редакція"}
+          </Link>
           <span>•</span>
           <span>{formatDate(article.published_at || article.created_at)}</span>
         </div>
@@ -158,6 +163,17 @@ export default async function ArticlePage({
         className="whitespace-pre-wrap max-w-3xl mx-auto px-6 prose prose-lg prose-slate font-medium leading-relaxed mb-16"
         dangerouslySetInnerHTML={{ __html: article.content || "" }}
       />
+
+      <div className="max-w-3xl mx-auto px-6 mb-16">
+        <p className="text-lg font-medium text-slate-700">
+          <Link
+            href={`/categories/${realCategorySlug}`}
+            className="text-blue-600 hover:text-blue-800 transition-colors underline"
+          >
+            Більше статей про {article.category?.name || realCategorySlug}
+          </Link>
+        </p>
+      </div>
 
       {related.length > 0 && (
         <div className="bg-slate-50 py-20 border-t border-slate-100 mt-20">
