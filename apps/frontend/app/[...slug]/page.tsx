@@ -227,6 +227,26 @@ export default async function ArticlePage({
           </Link>
           <span>•</span>
           <span>{formatDate(article.published_at || article.created_at)}</span>
+
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="opacity-70"
+            >
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            {article.views_count || 0}
+          </span>
         </div>
       </header>
 

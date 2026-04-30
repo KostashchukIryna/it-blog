@@ -84,30 +84,44 @@ export default async function HomePage({
       <div className="bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-6 py-16">
         <header className="mb-16">
-          <h1 className="text-6xl font-black text-slate-900 mb-4 tracking-tighter">
-            Останні публікації
+          <h1 className="text-7xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.9]">
+            Професійний блог <br />
+            <span className="text-blue-600">про розробку.</span>
           </h1>
 
-          <div className="flex flex-wrap gap-2 mb-8">
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                href={`/?category=${encodeURIComponent(cat)}&limit=12`}
-                className={`inline-block px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
-                  activeCategory === cat
-                    ? "bg-slate-900 text-white border-slate-900"
-                    : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"
-                }`}
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
-
-          <p className="text-slate-400 font-medium">
-            Показано {visibleArticles.length} із {filteredArticles.length}{" "}
-            статей
+          <p className="text-xl text-slate-500 max-w-2xl mb-10 leading-relaxed font-medium">
+            Досліджуємо світ Fullstack-розробки: від архітектури чистих API на
+            NestJS до тонкощів Core Web Vitals у Frontend. Тільки практичний
+            досвід та код.
           </p>
+
+          <div className="flex flex-col gap-6 border-t border-slate-100 pt-8">
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <Link
+                  key={cat}
+                  href={`/?category=${encodeURIComponent(cat)}&limit=12`}
+                  className={`inline-block px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
+                    activeCategory === cat
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "bg-white text-slate-400 border-slate-100 hover:border-slate-300"
+                  }`}
+                >
+                  {cat}
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-4">
+              <h2 className="text-4xl font-bold uppercase tracking-wider text-slate-900">
+                Останні публікації
+              </h2>
+              <span className="h-px flex-1 bg-slate-100"></span>
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-tighter">
+                {visibleArticles.length} із {filteredArticles.length} статей
+              </p>
+            </div>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
