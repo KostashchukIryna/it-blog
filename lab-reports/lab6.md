@@ -15,12 +15,108 @@
 |------------------------------------------------|--------------|-------------|--------------|-----------|-------------|----|----------|
 | https://example.com/articles/react-hooks-guide | article | 200 | Indexable | https://example.com/articles/react-hooks-guide | index,follow | React Hooks: повний гайд | Відсутній self-canonical на 2 схожих URL |
 | https://it-blog-news.pp.ua/                                           |   main           |       200      |     Indexable         |      Missing     |      None       |   Blog.IT - Новини технологій |  Canonical, meta robots        |
-| ...                                            |              |             |              |           |             |    |          |
-| https://it-blog-news.pp.ua/frontend/core-web-vitals-guide                                           |   article           |       200      |     Indexable         |    Missing       |       None      |Core Web Vitals: A Practical Guide to Web Performance    |          |
+| https://it-blog-news.pp.ua/categories/career                                         |  category            |   200          |     Indexable         |   Missing         |     None        | Career   |     Canonical, meta robot     |
+| https://it-blog-news.pp.ua/categories/architecture                                        |  category            |   200          |     Indexable         |   Missing         |     None        | Architecture  |     Canonical, meta robot     |
+| https://it-blog-news.pp.ua/categories/databases                                         |  category            |   200          |     Indexable         |   Missing         |     None        | Databases   |     Canonical, meta robot     |
+| https://it-blog-news.pp.ua/frontend/core-web-vitals-guide                                           |   article           |       200      |     Indexable         |    Missing       |       None      |Core Web Vitals: A Practical Guide to Web Performance    |  Canonical, meta robot         |
+| https://it-blog-news.pp.ua/databases/postgresql-performance-tips                                           |   article           |       200      |     Indexable         |    Missing       |       None      |PostgreSQL Performance Tips    |  Canonical, meta robot         |
+| https://it-blog-news.pp.ua/career/technical-interview-guide                                           |   article           |       200      |     Indexable         |    Missing       |       None      |Navigating the Technical Interview: A Survival Guide    |  Canonical, meta robot         |
+| https://it-blog-news.pp.ua/backend/getting-started-nodejs-express                                           |   article           |       200      |     Indexable         |    Missing       |       None      |Getting Started with Node.js and Express    |  Canonical, meta robot         |
+| https://it-blog-news.pp.ua/backend/nestjs-rest-api-tutorial                                           |   article           |       200      |     Indexable         |    Missing       |       None      |Building a Production-Ready REST API with NestJS    |  Canonical, meta robot         |
 | https://it-blog-news.pp.ua/about                                            | serving             |     200        |     Indexable         |    Missing       |     None        |  Про нас | Blog-IT  |   Canonical, meta robots       |
-| ...                                            |              |             |              |           |             |    |          |
+
+#### 1.2 - Перевірка технічних файлів і протоколу
+
+Перевірити:
+
+1. `https://ваш-домен/robots.txt`
+2. `https://ваш-домен/sitemap.xml` (або sitemap index)
+3. Перенаправлення `http -> https`
+4. Наявність mixed content
+
+Заповнити таблицю:
+
+| Перевірка | Статус (OK / Problem) | Деталі проблеми | Пріоритет |
+|-----------|------------------------|-----------------|-----------|
+| robots.txt доступний |    OK                    |                 |           |
+| Немає `Disallow: /` на продакшені |      OK                  |                 |           |
+| sitemap.xml доступний |        OK                |                 |           |
+| У sitemap тільки 200 + canonical URL |       Problem                |    Немає canonical             |     Критичний      |
+| Єдина канонічна версія домену (HTTPS, www/non-www) |        Problem              |            Версія з www видає помилку 404 (Railway) і не має SSL-сертифіката.       |       Середній    |
+| Немає mixed content |       OK                 |                 |           |
+
 ---
 ## 2. Впровадження налаштувань і виправлень
+#### 2.1 - Обов'язкові технічні налаштування (Lecture 6)
+
+**A. Налаштувати `robots.txt`**
+
+1. Створити/оновити файл `https://ваш-домен/robots.txt`
+2. Додати базові правила для продакшену:
+
+```txt
+User-agent: *
+Disallow: /admin/
+Disallow: /cart/
+Allow: /
+
+Sitemap: https://ваш-домен/sitemap.xml
+```
+
+3. Переконатися, що **немає** `Disallow: /`
+
+**B. Налаштувати `sitemap.xml`**
+
+1. Створити/оновити `https://ваш-домен/sitemap.xml`
+2. Включити тільки canonical URL зі статусом `200`
+3. Додати поле `lastmod` для URL, що змінювалися
+4. Відправити sitemap у Google Search Console
+
+**C. Налаштувати canonical на шаблонах**
+
+1. Перевірити шаблони: головна, категорія, стаття/товар
+2. Для кожного шаблону canonical має:
+   - бути абсолютним URL
+   - вести на сторінку зі статусом `200`
+   - не вести на URL з параметрами
+   
+![alt text](image-5.png)
+
+#### 2.2 - Виправлення знайдених помилок
+
+На основі аудиту (розділ 1) виправити щонайменше **6 технічних проблем**:
+
+- мінімум 2 проблеми рівня High
+- мінімум 2 проблеми пов'язані з індексацією/crawling
+- мінімум 1 проблема canonical/redirect
+- мінімум 1 проблема structured data або статус-кодів
+
+Заповнити таблицю:
+
+| № | Проблема | Вплив на SEO | Що зроблено | Де перевірено | Статус |
+|---|----------|--------------|-------------|---------------|--------|
+| 1 | Відсутні Canonical |High | Додано <link rel="canonical"> | DevTools + повторний crawl | Done |
+| 2 | Sitemap: URL Not In Sitemap         |   High           | Сторінки статей автоматично додаються в sitemap.xml при створенні.            |  /sitemap.xml            |   Done     |
+| 3 |   Відсутня мікророзмітка Schema.org       |    High         |    Впроваджено JSON-LD через next/head або Metadata API.        |   Google Rich Results Test            |  Done      |
+| 4 |  Sitemap: Non-200 URLs        |   Medium          |  З карти сайту видалено посилання, що вели на 404           |               |  Done       |
+| 5 | Відсутній `meta robots` | High | Додано `robots` у `<head>` | HTML source сторінок | Done |
+| 6 |  Відсутній HSTS заголовок        |    Medium          | Налаштовано Strict-Transport-Security заголовок на рівні сервера/middleware            |   DevTools -> Network -> Headers            |  Done      |
+
+![alt text](image-6.png)
+
+![alt text](image-7.png)
+#### 2.3 - Валідація після змін (re-audit)
+
+Після впровадження всіх правок виконати короткий повторний аудит і підтвердити, що критичні проблеми закрито:
+
+| Що перевіряємо повторно | Метод перевірки | Результат |
+|---|---|---|
+| `robots.txt` | `GET /robots.txt` | `200 OK`, є `Disallow` та `Sitemap` |
+| `sitemap.xml` | `GET /sitemap.xml` | `200 OK`, XML валідний, є `lastmod`, немає query URL |
+| Canonical на шаблонах | View-source / curl | На валідних сторінках canonical коректний |
+| 404 / status codes | curl / browser | Невідомі URL віддають `404`, не `200` |
+| Redirect chains | curl `-I` | `/about/` -> один `301` на `/about` |
+| Schema.org (article) | HTML source | Для валідної статті є `application/ld+json` |
 
 ---
 
