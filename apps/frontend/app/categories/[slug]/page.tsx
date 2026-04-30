@@ -1,5 +1,47 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }> | { slug: string };
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug.toLowerCase();
+  const API_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+  const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || 'https://it-blog-news.pp.ua';
+
+  try {
+    const catRes = await fetch(`${API_URL}/api/categories/${slug}`, { cache: 'no-store' });
+    
+    if (catRes.ok) {
+      const catResult = await catRes.json();
+      const categoryInfo = catResult.data || catResult;
+      
+      if (categoryInfo) {
+        const canonicalUrl = `${DOMAIN}/categories/${slug}`;
+        return {
+          title: `${categoryInfo.name} - Blog.IT`,
+          description: categoryInfo.description || `Публікації про ${categoryInfo.name}`,
+          alternates: {
+            canonical: canonicalUrl,
+          },
+          openGraph: {
+            title: `${categoryInfo.name} - Blog.IT`,
+            description: categoryInfo.description || `Публікації про ${categoryInfo.name}`,
+            type: "website",
+            url: canonicalUrl,
+          },
+        };
+      }
+    }
+  } catch (error) {
+    console.error("Помилка отримання метаданих категорії:", error);
+  }
+
+  return { title: "Category" };
+}
 
 export default async function CategoryPage({
   params,
@@ -54,10 +96,32 @@ export default async function CategoryPage({
 
   const visibleArticles = articles.slice(0, limit);
 
+  // JSON-LD Schema for Category/Collection
+  const canonicalUrl = `https://it-blog-news.pp.ua/categories/${slug}`;
+  const categorySchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: info.name,
+    description: info.description,
+    url: canonicalUrl,
+    publisher: {
+      "@type": "Organization",
+      name: "Blog.IT",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://it-blog-news.pp.ua/logo.png",
+      },
+    },
+  };
+
   return (
-    <div className="bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categorySchema) }}
+      />
+      <div className="bg-white min-h-screen">
+        <div className="max-w-7xl mx-auto px-6 py-16">
         <header className="mb-16 border-b border-slate-100 pb-12">
           <nav className="mb-8 text-[12px] font-black uppercase tracking-widest text-slate-400">
             <ol className="flex items-center space-x-2">
@@ -110,6 +174,7 @@ export default async function CategoryPage({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

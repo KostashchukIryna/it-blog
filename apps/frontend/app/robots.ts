@@ -5,7 +5,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/admin/', // закриваємо адмінку від пошуку
+      disallow: [
+        '/admin/', // закриваємо адмінку від пошуку
+        '/cart/',  // закриваємо кошик
+      ],
     },
     sitemap: 'https://it-blog-news.pp.ua/sitemap.xml',
   }
