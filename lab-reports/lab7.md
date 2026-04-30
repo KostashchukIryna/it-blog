@@ -71,51 +71,28 @@
 
 | Налаштування | Статус | Доказ | Коментар |
 |--------------|--------|-------|----------|
-| GA4 property створено та збір даних активний | OK | ![alt text](image-5.png) | Data stream  активний |
-| Фільтрація внутрішнього трафіку | ОК |![alt text](image-6.png) | Активний |
-| Єдині UTM-правила для test campaign | ОК |![alt text](image-7.png) | Налаштовано |
+| GA4 property створено та збір даних активний | OK | ![alt text](image-8.png) | Data stream  активний |
+| Фільтрація внутрішнього трафіку | ОК |![alt text](image-9.png) | Активний |
+| Єдині UTM-правила для test campaign | ОК |![alt text](image-10.png) | Налаштовано |
 
 #### 3.2 - Події для SEO-оцінки (через GTM або код)
 
-Реалізувати мінімум **6 подій**, серед них обов'язково:
-
-- `scroll_75`
-- `view_search_results` (якщо є внутрішній пошук)
-- `click_cta_primary`
-- `form_start` або `generate_lead`
-- `form_submit` або `purchase`
-- `click_related_article`
-
-Таблиця **"GA4 Event Mapping"**:
-
 | Event name | Trigger | Parameters | Бізнес/SEO сенс | Перевірка в DebugView |
 |------------|---------|------------|------------------|-----------------------|
-| click_cta_primary | Клік по головній кнопці hero | page_type, intent_type, cta_label | Чи рухається користувач до цілі після входу з органіки | Event видно з параметрами |
-| ... | | | | |
+| `click_cta_primary` | Клік по головній кнопці hero-секції | `page_type`, `intent_type`, `cta_label` | Чи переходить органічний трафік до цільової дії після першого екрану | Event відображається з усіма параметрами |
+| `scroll_75` | Користувач доскролив до 75% висоти сторінки | `page_type`, `page_path`, `content_category` | Індикатор якісного читання — сигнал для Google про корисність сторінки | Event відображається з параметром `page_path` |
+| `view_search_results` | Відображення сторінки результатів внутрішнього пошуку | `search_query`, `results_count`, `search_source` | Чи задовольняє контент інформаційний намір користувача | Event з параметром `search_query` видно в DebugView |
+| `form_start` | Фокус на першому полі підписки / лід-форми | `form_id`, `form_placement`, `page_type` | Міряє намір підписатися ще до відправки — допомагає знайти friction | Event видно одразу після кліку в поле |
+| `generate_lead` | Успішна відправка лід-форми або підписки | `form_id`, `lead_type`, `page_path` | Основна мікроконверсія для контентного сайту | Event з `lead_type` видно в DebugView |
+| `click_related_article` | Клік на рекомендовану / пов'язану статтю | `source_slug`, `target_slug`, `block_position` | Глибина сесії та внутрішня перелінковка — вплив на crawlability і dwell time | Event з обома slug-параметрами видно в DebugView |
 
 #### 3.3 - Налаштування conversions і аудиторій
 
-1. Позначити мінімум **2 ключові conversion events**
-2. Створити мінімум **3 аудиторії**:
-   - Organic Engaged Users
-   - Organic Non-Engaged
-   - Organic Returning Users
-
-Таблиця:
-
 | Тип | Назва | Умова | Навіщо |
 |-----|-------|-------|--------|
-| Conversion | form_submit | event_name = form_submit | Оцінка внеску SEO у ліди |
-| ... | | | |
-
-#### 3.4 - Щотижневий GA4 SEO report
-
-Сформувати короткий шаблон щотижневого звіту:
-
-| KPI | Поточне значення | Минулого тижня | Delta | Порог тривоги | Дія |
-|-----|------------------|----------------|-------|---------------|-----|
-| Organic sessions | 2380 | 2210 | +7.7% | -10% WoW | Продовжити тест CTA на категоріях |
-| ... | | | | | |
+| Conversion | `form_submit` | `event_name = form_submit` | Оцінка внеску SEO у ліди (хто залишив контакти) |
+| Conversion | `click_cta_primary` | `event_name = click_cta_primary` | Відстеження готовності до покупки з органіки |
+| Audience | Organic Engaged | `Medium = organic` + `Engaged session` | Аналіз ядра цільової аудиторії з пошуку |
 
 ---
 
