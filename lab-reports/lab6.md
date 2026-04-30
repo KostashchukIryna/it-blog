@@ -4,7 +4,21 @@
 ---
 
 ## 1. Технічний аудит (діагностика)
+1.1 - Crawl та інвентаризація технічного стану
 
+Зробити технічний crawl сайту (Screaming Frog або аналог) і заповнити таблицю **"Technical Audit"**:
+
+У цьому розділі фокус на критичних технічних проблемах, які потрібно виправити. Базові перевірки індексації та швидкості
+вже виконувалися у попередніх лабораторних, тут ми працюємо з пріоритетами для впровадження.
+
+| URL                                            | Тип сторінки | Status code | Indexability | Canonical | Meta robots | H1 | Проблема |
+|------------------------------------------------|--------------|-------------|--------------|-----------|-------------|----|----------|
+| https://example.com/articles/react-hooks-guide | article | 200 | Indexable | https://example.com/articles/react-hooks-guide | index,follow | React Hooks: повний гайд | Відсутній self-canonical на 2 схожих URL |
+| https://it-blog-news.pp.ua/                                           |   main           |       200      |     Indexable         |      Missing     |      None       |   Blog.IT - Новини технологій |  Canonical, meta robots        |
+| ...                                            |              |             |              |           |             |    |          |
+| https://it-blog-news.pp.ua/frontend/core-web-vitals-guide                                           |   article           |       200      |     Indexable         |    Missing       |       None      |Core Web Vitals: A Practical Guide to Web Performance    |          |
+| https://it-blog-news.pp.ua/about                                            | serving             |     200        |     Indexable         |    Missing       |     None        |  Про нас | Blog-IT  |   Canonical, meta robots       |
+| ...                                            |              |             |              |           |             |    |          |
 ---
 ## 2. Впровадження налаштувань і виправлень
 
